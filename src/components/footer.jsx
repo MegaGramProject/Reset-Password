@@ -1,0 +1,164 @@
+import React, { Component } from 'react';
+import dropdownV from './images/dropdownV.png';
+import './styles.css';
+
+class Footer extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+        language: "English"
+        };
+    }
+
+    changeLanguage = (newLanguage) =>  {
+        this.setState({ language: newLanguage });
+        console.log(this.state.language);
+    }
+
+    translateTextPromise = async function(text, language1, language2){
+        let language1Code;
+        let language2Code;
+        if (language1==="English"){
+            language1Code = "en";
+        }
+        else if(language1==="Español") {
+            language1Code = "es";
+        }
+        else if(language1==="Français") {
+            language1Code = "fr";
+        }
+        else if(language1==="हिंदी") {
+            language1Code = "hi";
+        }
+        else if(language1==="中国人") {
+            language1Code = "zh-CN";
+        }
+        else if(language1==="বাংলা"){
+            language1Code = "bn";
+        }
+        else if(language1==="العربية") {
+            language1Code = "ar";
+        }
+        else if(language1==="Deutsch") {
+            language1Code = "de";
+        }
+        else if(language1==="Bahasa Indonesia") {
+            language1Code = "id";
+        }
+        else if(language1==="Italiano"){
+            language1Code = "it";
+        }
+        else if(language1==="日本語") {
+            language1Code = "ja";
+        }
+        else if(language1==="Русский") {
+            language1Code = "ru";
+        }
+        if (language2==="English"){
+            language2Code = "en";
+        }
+        else if(language2==="Español") {
+            language2Code = "es";
+        }
+        else if(language2==="Français") {
+            language2Code = "fr";
+        }
+        else if(language2==="हिंदी") {
+            language2Code = "hi";
+        }
+        else if(language2==="中国人") {
+            language2Code = "zh-CN";
+        }
+        else if(language2==="বাংলা"){
+            language2Code = "bn";
+        }
+        else if(language2==="العربية") {
+            language2Code = "ar";
+        }
+        else if(language2==="Deutsch") {
+            language2Code = "de";
+        }
+        else if(language2==="Bahasa Indonesia") {
+            language2Code = "id";
+        }
+        else if(language2==="Italiano"){
+            language2Code = "it";
+        }
+        else if(language2==="日本語") {
+            language2Code = "ja";
+        }
+        else if(language2==="Русский") {
+            language2Code = "ru";
+        }
+        const apiUrl = "https://deep-translate1.p.rapidapi.com/language/translate/v2";
+        const data = {"q":text,"source":language1Code,"target":language2Code};
+        const options = {
+            method: 'POST',
+            headers: {
+            'Content-Type': 'application/json',
+            'x-rapidapi-host': 'deep-translate1.p.rapidapi.com',
+            'x-rapidapi-key': '14da2e3b7emsh5cd3496c28a4400p16208cjsn947339fe37a4'
+            },
+            body: JSON.stringify(data)
+        };
+        try {
+            const response = await fetch(apiUrl, options);
+            if (!response.ok) {
+                throw new Error("Network response not ok");
+            }
+            return response.json()['data']['translations']['translatedText'];
+        }
+
+        catch (error) {
+            console.error('Error:', error);
+            return "";
+        }
+    }
+
+    translateText(text, language1, language2) {
+        if(language1===language2) {
+            return text;
+        }
+        this.translateTextPromise(text, language1, language2).then(translatedText => {
+            return translatedText;
+        }
+        );
+    }
+
+
+    
+
+    render() {
+        return (
+            <React.Fragment>
+                <footer className="footnote">
+                    {this.translateText("An enhanced version of Instagram, created as a personal project and powered by Rishav Ray", "English", this.state.language)}
+                </footer>
+                <div className="dropdown">
+                    <button className="dropbtn">
+                        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.1em' }}>
+                            <span id="language" style={{ marginLeft: '-15em', fontSize:'1.2em'}}>{this.state.language}</span>
+                            <img className="dropdownV" src={dropdownV} style={{ marginTop: '0em' }} alt="Dropdown" />
+                        </div>
+                    </button>
+                    <div id="languageList" className="dropdown-content">
+                        <p onClick={() => this.changeLanguage('العربية')}>العربية</p>
+                        <p onClick={() => this.changeLanguage('বাংলা')}>বাংলা</p>
+                        <p onClick={() => this.changeLanguage('Deutsch')}>Deutsch</p>
+                        <p onClick={() => this.changeLanguage('English')}>English</p>
+                        <p onClick={() => this.changeLanguage('Español')}>Español</p>
+                        <p onClick={() => this.changeLanguage('Français')}>Français</p>
+                        <p onClick={() => this.changeLanguage('हिंदी')}>हिंदी</p>
+                        <p onClick={() => this.changeLanguage('Bahasa Indonesia')}>Bahasa Indonesia</p>
+                        <p onClick={() => this.changeLanguage('Italiano')}>Italiano</p>
+                        <p onClick={() => this.changeLanguage('日本語')}>日本語</p>
+                        <p onClick={() => this.changeLanguage('Русский')}>Русский</p>
+                        <p onClick={() => this.changeLanguage('中国人')}>中国人</p>
+                    </div>
+                </div>
+            </React.Fragment>
+        );
+    }
+}
+
+export default Footer;
