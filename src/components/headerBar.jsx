@@ -4,9 +4,6 @@ import './styles.css';
 class HeaderBar extends Component {
     constructor(props) {
         super(props);
-        this.state = {
-        title: "Megagram"
-        };
     }
 
     headingStyle = {
@@ -27,7 +24,7 @@ class HeaderBar extends Component {
     render() {
         return (
         <React.Fragment>
-        <h1 class="headerMegagram" style={this.headingStyle}><span onClick={this.takeUserToLogin} style={this.titleStyle}>{this.state.title}</span></h1>
+        <h1 className="headerMegagram" style={this.headingStyle}><span onClick={this.takeUserToLogin} style={this.titleStyle}>{this.props.title}</span></h1>
         <hr />
         </React.Fragment>);
     }

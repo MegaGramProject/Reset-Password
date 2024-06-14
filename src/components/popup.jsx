@@ -1,20 +1,18 @@
 import React, { Component } from 'react';
-import dropdownV from './images/dropdownV.png';
 import './styles.css';
 
-class Footer extends Component {
+class Popup extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            footnoteText: "An enhanced version of Instagram, created as a personal project and powered by Rishav Ray"
+            popupHeader: this.props.popupHeader,
+            popupMessage: this.props.popupMessage,
+            ok: "OK"
         };
-    }
+    };
 
-    changeLanguage = (newLanguage) =>  {
-        this.props.changeLanguage(newLanguage);
-    }
 
-    translateTextPromise = async function(text, language1, language2){
+    translateTextPromise = async (text, language1, language2) => {
         let language1Code;
         let language2Code;
         if(language1===language2) {
@@ -117,60 +115,91 @@ class Footer extends Component {
         }
     }
 
-    async updateFootnoteText(currLang) {
+    updateHeaderText = async (currLang) => {
         try {
             const translatedText = await this.translateTextPromise(
-                this.state.footnoteText,
+                this.props.popupHeader,
                 currLang,
                 this.props.language
             );
-            this.setState({ footnoteText: translatedText });
+            this.setState({popupHeader: translatedText});
         } catch (error) {
             console.error("Translation failed", error);
         }
     }
 
-    async componentDidMount() {
-        await this.updateFootnoteText("English");
-    }
-    
-    async componentDidUpdate(prevProps, prevState) {
-        if (prevProps.language !== this.props.language) {
-            await this.updateFootnoteText(prevProps.language);
+    updateMessageText = async (currLang) => {
+        try {
+            const translatedText = await this.translateTextPromise(
+                this.state.popupMessage,
+                currLang,
+                this.props.language
+            );
+            this.setState({popupMessage: translatedText});
+        } catch (error) {
+            console.error("Translation failed", error);
         }
+    }
+
+    updateOk = async (currLang) => {
+        try {
+            const translatedText = await this.translateTextPromise(
+                this.state.ok,
+                currLang,
+                this.props.language
+            );
+            this.setState({ok: translatedText});
+        } catch (error) {
+            console.error("Translation failed", error);
+        }
+    }
+
+    componentDidMount = async () => {
+        await this.updateHeaderText("English");
+        await this.updateMessageText("English");
+        await this.updateOk("English");
+    }
+
+    async componentDidUpdate(prevProps, prevState) {
+        if (prevProps.popupHeader !== this.props.popupHeader) {
+            this.setState({ popupHeader: this.props.popupHeader });
+            await this.updateHeaderText("English");
+        }
+        else if(prevProps.language !== this.props.language) {
+            await this.updateHeaderText(prevProps.language);
+        }
+        if (prevProps.popupMessage !== this.props.popupMessage) {
+            this.setState({ popupMessage: this.props.popupMessage });
+            await this.updateMessageText("English");
+        }
+        else if(prevProps.language !== this.props.language) {
+            await this.updateMessageText(prevProps.language);
+        }
+        if (prevProps.language !== this.props.language) {
+            await this.updateOk(prevProps.language);
+        }
+
     }
     
 
+    removePopup = () => {
+        this.props.removePopup();
+    };
+
     render() {
         return (
-            <React.Fragment>
-                <footer id="footnote" className="footnote">{this.state.footnoteText}</footer>
-                <div className="dropdown">
-                <button className="dropbtn">
-                        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.1em' }}>
-                            <span id="language" style={{fontSize:'1.2em'}}>{this.props.language}</span>
-                            <img className="dropdownV" src={dropdownV} style={{ marginTop: '0em' }} alt="Dropdown" />
-                        </div>
-                </button>
-                <div id="languageList" className="dropdown-content">
-                        <p onClick={() => this.changeLanguage('العربية')}>العربية</p>
-                        <p onClick={() => this.changeLanguage('বাংলা')}>বাংলা</p>
-                        <p onClick={() => this.changeLanguage('Deutsch')}>Deutsch</p>
-                        <p onClick={() => this.changeLanguage('English')}>English</p>
-                        <p onClick={() => this.changeLanguage('Español')}>Español</p>
-                        <p onClick={() => this.changeLanguage('Français')}>Français</p>
-                        <p onClick={() => this.changeLanguage('हिंदी')}>हिंदी</p>
-                        <p onClick={() => this.changeLanguage('Bahasa Indonesia')}>Bahasa Indonesia</p>
-                        <p onClick={() => this.changeLanguage('Italiano')}>Italiano</p>
-                        <p onClick={() => this.changeLanguage('日本語')}>日本語</p>
-                        <p onClick={() => this.changeLanguage('Русский')}>Русский</p>
-                        <p onClick={() => this.changeLanguage('中国人')}>中国人</p>
+                <div style={{width:'40em', height: '16em', borderStyle:'solid', borderRadius:'1.7em', borderColor:'lightgray', borderWidth: '0.12em',
+                paddingTop:'2em'}}>
+                <h3>{this.state.popupHeader}</h3>
+                <p style={{color:'gray', fontSize: '1.3em'}}>{this.state.popupMessage}</p>
+                <br/>
+                <hr/>
+                <p onClick={this.removePopup} style={{color:'#2890eb', fontSize: '1.5em', fontWeight:'bold', cursor:'pointer'}}>
+                {this.state.ok}</p>
                 </div>
-                </div>
-            </React.Fragment>
         );
     }
 }
 
 
-export default Footer;
+export default Popup;

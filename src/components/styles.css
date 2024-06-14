@@ -86,7 +86,7 @@ body {
 .textInput::placeholder {
     color: #636364;
     opacity: 1;
-    font-size: 13.5px;
+    font-size: 1em;
 }
 
 .blueButton {
@@ -178,7 +178,7 @@ font-size: 13px;
 .footnote {
     color: gray;
     font-size: 1.2em;
-    margin-top: -30em;
+    margin-top: -25em;
 }
 
 .dropbtn {
@@ -188,8 +188,6 @@ font-size: 13px;
     border: none;
     margin-top: 8px;
     width: 60px;
-    left: 47%;
-    margin-left: 30em;
 }
 
 
@@ -199,7 +197,6 @@ font-size: 13px;
     background-color: #e2e8ed;
     width: 160px;
     padding-top:0px;
-    margin-left: 22em;
 
 }
 
@@ -210,13 +207,11 @@ font-size: 13px;
     text-decoration: none;
     display: block;
     font-size:small;
-    left: 47%;
 }
 
 .dropdown {
-    width: 7%;
+    width: 5%;
     align-items: center;
-    left: 10%;
 }
 
 

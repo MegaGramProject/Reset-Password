@@ -6,12 +6,14 @@ class MainBox extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            inputValue: "",
-            language: "English",
-            isButtonEnabled: false,
-            msg: ""
+        troubleLoggingIn: "Trouble logging in?",
+        instructions: "Enter your email, phone, or username and we'll send you a link to get back into your account.",
+        inputPlaceholder: "Email, Phone, or Username",
+        buttonText: "Send login link",
+        orText: "OR",
+        createAccount: "Create new account",
+        backToLogin: "Back to login"
         };
-
         this.handleChange = this.handleChange.bind(this);
         this.sendLoginLink = this.sendLoginLink.bind(this);
     }
@@ -58,12 +60,12 @@ class MainBox extends Component {
             }
         }
         return true;
-    }
+    };
 
     isValidNumber(number) {
         const phoneRegex = /^\d{8,17}$/;
         return phoneRegex.test(number);
-    }
+    };
 
     usernameIsValid(usernameInput) {
         if (usernameInput.length > 30 || usernameInput.length < 1) {
@@ -79,98 +81,25 @@ class MainBox extends Component {
         }
 
         return true;
-    }
+    };
 
 
     handleChange(event) {
         const value = event.target.value;
-        this.setState({
-            inputValue: value,
-            isButtonEnabled: this.isValidEmail(value) || this.isValidNumber(value) || this.usernameIsValid(value),
-        });
+        this.props.onInputChange(value, this.isValidEmail(value) || this.isValidNumber(value) || this.usernameIsValid(value));
     }
 
     sendLoginLink() {
-        if(this.isValidEmail(this.state.inputValue)) {
-            const apiUrl = "http://localhost:8002/sendLoginLink";
-            const data = {"email": this.state.inputValue}
-            const options = {
-                method: "POST",
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            }
-            fetch(apiUrl, options)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error("Network response not ok");
-                }
-                return response.json();
-            }).then(data => {
-                this.setState({
-                        msg: "The login-link has been sent to your email-address"
-                    })
-                });
+        this.props.sendLoginLink(this.props.inputValue);
     }
-    else if(this.isValidNumber(this.state.inputValue)) {
-        const apiUrl = "http://localhost:8002/sendLoginLink";
-        const data = {"number": this.state.inputValue}
-        const options = {
-            method: "POST",
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        }
-        fetch(apiUrl, options)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error("Network response not ok");
-            }
-            return response.json();
-        }).then(data => {
-            this.setState({
-                msg: "The login-link has been sent to your number"
-                })
-            });
-
-    }
-    else {
-        const apiUrl = "http://localhost:8002/sendLoginLink";
-        const data = {"username": this.state.inputValue}
-        const options = {
-            method: "POST",
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        }
-        fetch(apiUrl, options)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error("Network response not ok");
-            }
-            return response.json();
-        }).then(data => {
-            if(data.success) {
-                this.setState({
-                    msg: "The login-link has been sent to your contactInfo"
-                    })
-            }
-            else {
-                this.setState({
-                    msg: "User not found"
-                })
-            }
-            });
-    }
-}
 
     
 translateTextPromise = async function(text, language1, language2){
     let language1Code;
     let language2Code;
+    if(language1===language2) {
+        return text;
+    }
     if (language1==="English"){
         language1Code = "en";
     }
@@ -264,18 +193,123 @@ translateTextPromise = async function(text, language1, language2){
 
     catch (error) {
         console.error('Error:', error);
-        return "";
+        return "T";
     }
     }
 
-    translateText(text, language1, language2) {
-            if(language1===language2) {
-                return text;
-                }
-            this.translateTextPromise(text, language1, language2).then(translatedText => {
-            return translatedText;
-            });
+    async updateTroubleLoggingIn(currLang) {
+        try {
+            const translatedText = await this.translateTextPromise(
+                this.state.troubleLoggingIn,
+                currLang,
+                this.props.language
+            );
+            this.setState({troubleLoggingIn: translatedText});
+        } catch (error) {
+            console.error("Translation failed", error);
         }
+    }
+
+    async updateInstructions(currLang) {
+        try {
+            const translatedText = await this.translateTextPromise(
+                this.state.instructions,
+                currLang,
+                this.props.language
+            );
+            this.setState({instructions: translatedText});
+        } catch (error) {
+            console.error("Translation failed", error);
+        }
+    }
+
+    async updateInputPlaceholder(currLang) {
+        try {
+            const translatedText = await this.translateTextPromise(
+                this.state.inputPlaceholder,
+                currLang,
+                this.props.language
+            );
+            this.setState({inputPlaceholder: translatedText});
+        } catch (error) {
+            console.error("Translation failed", error);
+        }
+    }
+
+    async updateButtonText(currLang) {
+        try {
+            const translatedText = await this.translateTextPromise(
+                this.state.buttonText,
+                currLang,
+                this.props.language
+            );
+            this.setState({buttonText: translatedText});
+        } catch (error) {
+            console.error("Translation failed", error);
+        }
+    }
+
+    async updateOrText(currLang) {
+        try {
+            const translatedText = await this.translateTextPromise(
+                this.state.orText,
+                currLang,
+                this.props.language
+            );
+            this.setState({orText: translatedText});
+        } catch (error) {
+            console.error("Translation failed", error);
+        }
+    }
+
+    async updateCreateAccount(currLang) {
+        try {
+            const translatedText = await this.translateTextPromise(
+                this.state.createAccount,
+                currLang,
+                this.props.language
+            );
+            this.setState({createAccount: translatedText});
+        } catch (error) {
+            console.error("Translation failed", error);
+        }
+    }
+
+    async updateBackToLogin(currLang) {
+        try {
+            const translatedText = await this.translateTextPromise(
+                this.state.backToLogin,
+                currLang,
+                this.props.language
+            );
+            this.setState({backToLogin: translatedText});
+        } catch (error) {
+            console.error("Translation failed", error);
+        }
+    }
+
+
+    async componentDidMount() {
+        await this.updateTroubleLoggingIn("English");
+        await this.updateInstructions("English");
+        await this.updateInputPlaceholder("English");
+        await this.updateButtonText("English");
+        await this.updateOrText("English");
+        await this.updateCreateAccount("English");
+        await this.updateBackToLogin("English");
+    }
+
+    async componentDidUpdate(prevProps, prevState) {
+        if (prevProps.language !== this.props.language) {
+            await this.updateTroubleLoggingIn(prevProps.language);
+            await this.updateInstructions(prevProps.language);
+            await this.updateInputPlaceholder(prevProps.language);
+            await this.updateButtonText(prevProps.language);
+            await this.updateOrText(prevProps.language);
+            await this.updateCreateAccount(prevProps.language);
+            await this.updateBackToLogin(prevProps.language);
+        }
+    }
 
 
 
@@ -283,46 +317,48 @@ translateTextPromise = async function(text, language1, language2){
         const sendLinkButtonStyle = {
             width: '30em',
             height: '3em',
-            backgroundColor: this.state.isButtonEnabled ? '#347aeb' : '#82bbf5',
-            cursor: this.state.isButtonEnabled ? 'pointer' : 'initial',
+            backgroundColor: this.props.isButtonEnabled ? '#347aeb' : '#82bbf5',
+            cursor: this.props.isButtonEnabled ? 'pointer' : 'initial',
         };
 
+
+
         return (
-            <React.Fragment>
+                <React.Fragment>
                 <div className="box" style={this.boxStyle}>
                     <img src={lockSymbol} style={this.lockSymbolStyle} alt="Lock Symbol" />
-                    <p style={{ fontSize: '1.5em', fontWeight: 'bold', marginTop: '-3em' }}>{this.translateText("Trouble logging in?", "English", this.state.language)}</p>
+                    <p style={{ fontSize: '1.5em', fontWeight: 'bold', marginTop: '-3em' }}>{this.state.troubleLoggingIn}</p>
                     <p style={{ color: '#828281', fontSize: '1.2em', width: '19em' }}>
-                    {this.translateText("Enter your email, phone, or username and we'll send you a link to get back into your account.", "English", this.state.language)}
+                    {this.state.instructions}
                     </p>
                     <input
                         className="textInput"
                         style={{ width: '23em', padding: '1.5em 1em' }}
                         type="text"
-                        placeholder={this.translateText("Email, Phone, or Username", "English", this.state.language)}
+                        placeholder={this.state.inputPlaceholder}
                         onChange={this.handleChange}
+                        value = {this.props.inputValue}
                     />
                     <button
                         id="sendLinkButton"
                         className="blueButton"
                         style={sendLinkButtonStyle}
-                    >
-                        {this.translateText("Send login link", "English", this.state.language)}
+                        onClick = {this.props.isButtonEnabled ? this.sendLoginLink : null}>
+                        {this.state.buttonText}
                     </button>
-                    <p id="noUsersFound" style={{color:'black', fontSize:'small', display:'none'}}>{this.translateText(this.state.msg, "English", this.state.language)}</p>
                     <br />
                     <div>
                         <p className="orLine">_________________</p>
-                        <p className="OR">{this.translateText("OR", "English", this.state.language)}</p>
+                        <p className="OR">{this.state.orText}</p>
                         <p className="orLine" style={{ marginLeft: '0.5em' }}>_________________</p>
                     </div>
-                    <a href="http://localhost:8000/signUp" className="noUnderline" style={{ fontWeight: 'bold', fontSize: '1.2em', marginTop: '1em', color:'black'}}>{this.translateText("Create new account", "English", this.state.language)}</a>
+                    <a href="http://localhost:8000/signUp" className="noUnderline" style={{ fontWeight: 'bold', fontSize: '1.2em', marginTop: '1em', color:'black'}}>{this.state.createAccount}</a>
                     <br />
                 </div>
                 <div className="box" style={{ width: '33em', height: '3.2em', backgroundColor: '#f7f5f5', borderStyle: 'solid', borderColor: 'gray', marginBottom: '40em' }}>
-                    <a href="http://localhost:8000/login" className="noUnderline" style={{ fontWeight: 'bold', fontSize: '1.2em', color: 'black' }}>{this.translateText("Back to login", "English", this.state.language)}</a>
+                    <a href="http://localhost:8000/login" className="noUnderline" style={{ fontWeight: 'bold', fontSize: '1.2em', color: 'black' }}>{this.state.backToLogin}</a>
                 </div>
-            </React.Fragment>
+                </React.Fragment>
         );
     }
 }
