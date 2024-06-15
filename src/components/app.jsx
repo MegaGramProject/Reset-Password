@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import Footer from "./footer";
-import Header from "./headerBar";
+import HeaderBar from "./headerBar";
 import MainBox from "./mainBox";
 import Popup from './popup';
 import './styles.css';
@@ -16,6 +16,7 @@ class App extends Component {
         popupHeader: "",
         popupMessage: ""
         };
+        this.deletePopup = this.deletePopup.bind(this);
         };
 
     changeLanguage = (newLanguage) =>  {
@@ -26,6 +27,13 @@ class App extends Component {
         this.setState({
             inputValue: value,
             isButtonEnabled: buttonStatus,
+        });
+    }
+
+    deletePopup() {
+        this.setState({
+        isPopupEnabled: false,
+        isButtonEnabled: true,
         });
     }
 
@@ -224,12 +232,6 @@ class App extends Component {
     }
     }
 
-    removePopup = () => {
-        this.setState({
-            isPopupEnabled: false,
-            isButtonEnabled: true,
-        });
-    };
 
 
 
@@ -254,14 +256,14 @@ class App extends Component {
 
         return (
             <React.Fragment>
-                <Header title="Megagram" />
+                <HeaderBar title="Megagram" />
                 <div style={mainBoxAndFooterDivStyle}>
                 <MainBox language={this.state.language} inputValue={this.state.inputValue} isButtonEnabled={this.state.isButtonEnabled} popupMessage={this.state.popupMessage}
                 onInputChange={this.onInputChange} sendLoginLink={this.sendLoginLink}/>
                 <Footer language={this.state.language} changeLanguage={this.changeLanguage} />
                 </div>
                 <div style={popupDivStyle}>
-                <Popup language={this.state.language} removePopup={this.removePopup} popupHeader={this.state.popupHeader} popupMessage={this.state.popupMessage}/>
+                <Popup language={this.state.language} deletePopup={this.deletePopup} popupHeader={this.state.popupHeader} popupMessage={this.state.popupMessage}/>
                 </div>
             </React.Fragment>
         );

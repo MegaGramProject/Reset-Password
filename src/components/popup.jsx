@@ -9,7 +9,14 @@ class Popup extends Component {
             popupMessage: this.props.popupMessage,
             ok: "OK"
         };
-    };
+        this.removePopup = this.removePopup.bind(this);
+        };
+
+    removePopup(){
+            this.props.deletePopup();
+        };
+
+
 
 
     translateTextPromise = async (text, language1, language2) => {
@@ -182,10 +189,6 @@ class Popup extends Component {
     }
     
 
-    removePopup = () => {
-        this.props.removePopup();
-    };
-
     render() {
         return (
                 <div style={{width:'40em', height: '16em', borderStyle:'solid', borderRadius:'1.7em', borderColor:'lightgray', borderWidth: '0.12em',
@@ -194,7 +197,7 @@ class Popup extends Component {
                 <p style={{color:'gray', fontSize: '1.3em'}}>{this.state.popupMessage}</p>
                 <br/>
                 <hr/>
-                <p onClick={this.removePopup} style={{color:'#2890eb', fontSize: '1.5em', fontWeight:'bold', cursor:'pointer'}}>
+                <p style={{color:'#2890eb', fontSize: '1.5em', fontWeight:'bold', cursor:'pointer'}} onClick={this.removePopup}>
                 {this.state.ok}</p>
                 </div>
         );

@@ -5,6 +5,7 @@ import './styles.css';
 class MainBox extends Component {
     constructor(props) {
         super(props);
+        console.log(props);
         this.state = {
         troubleLoggingIn: "Trouble logging in?",
         instructions: "Enter your email, phone, or username and we'll send you a link to get back into your account.",
