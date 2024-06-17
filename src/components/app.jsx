@@ -210,7 +210,7 @@ class App extends Component {
                     isButtonEnabled: false,
                     isPopupEnabled: true,
                     popupHeader: "Link Sent",
-                    popupMessage: "The login-link has been sent to your contactInfo"
+                    popupMessage: "The login-link has been sent to your Contact Info"
                     })
             }
             else {

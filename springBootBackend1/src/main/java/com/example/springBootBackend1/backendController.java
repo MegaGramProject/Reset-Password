@@ -1,9 +1,17 @@
 package com.example.springBootBackend1;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
+import java.util.Base64;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Map;
 import java.util.Properties;
 
@@ -17,16 +25,20 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseCookie;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.twilio.Twilio;
 import com.twilio.type.PhoneNumber;
 
+import jakarta.servlet.http.HttpServletResponse;
+
 @RestController
-@CrossOrigin(origins = "*")
 public class backendController {
 
     @Value("${spring.datasource.url}")
@@ -44,7 +56,12 @@ public class backendController {
 
     public static final String twilioPhoneNumber = System.getenv("twilioPhoneNumber");
 
+    private static final SecureRandom secureRandom = new SecureRandom();
+
+    private static final Base64.Encoder base64Encoder = Base64.getUrlEncoder().withoutPadding();
+
     @PostMapping("/sendLoginLink")
+    @CrossOrigin(origins = "http://localhost:3001")
     public String sendLoginLink(@RequestBody Map<String, String> request) {
         try (Connection connection = DriverManager.getConnection(dbUrl, dbUsername, dbPassword)) {
             if (request.containsKey("email")) {
@@ -181,5 +198,90 @@ public class backendController {
 
         com.twilio.rest.api.v2010.account.Message
                 .creator(new PhoneNumber(number), new PhoneNumber(twilioPhoneNumber), messageBody).create();
+    }
+
+    @PostMapping("/getTokens")
+    @CrossOrigin(origins = "http://localhost:8000")
+    public String getTokens(@RequestBody Map<String, String> request) {
+        try (Connection connection = DriverManager.getConnection(dbUrl, dbUsername, dbPassword)) {
+            if (request.containsKey("username")) {
+                String username = request.get("username");
+                String authToken = generateToken(113);
+                String refreshToken = generateToken(113);
+
+                String authTokenExpiry = getExpirationDate(45);
+                String refreshTokenExpiry = getExpirationDate(4320);
+
+                String hashedAuthToken = hashToken(authToken);
+                String hashedRefreshToken = hashToken(refreshToken);
+
+                updateDatabase(connection, username, hashedAuthToken, hashedRefreshToken, authTokenExpiry,
+                        refreshTokenExpiry);
+                return "{\"token\": \"" + authToken + "\", \"refreshToken\": \"" + refreshToken + "\"}";
+            } else {
+                return "{\"error\": \"Invalid request\"}";
+            }
+
+        } catch (Exception e) {
+            return "{\"error\": \"Internal server error\"}";
+        }
+    }
+
+    private String generateToken(int byteLength) {
+        byte[] randomBytes = new byte[byteLength];
+        secureRandom.nextBytes(randomBytes);
+        return base64Encoder.encodeToString(randomBytes);
+    }
+
+    private String hashToken(String token) throws NoSuchAlgorithmException {
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        byte[] hash = digest.digest(token.getBytes());
+        return Base64.getEncoder().encodeToString(hash);
+    }
+
+    private void updateDatabase(Connection connection, String username, String hashedAuthToken,
+            String hashedRefreshToken, String authTokenExpiry, String refreshTokenExpiry) throws Exception {
+        String sql = "INSERT INTO userTokens (username, authToken, refreshToken, authTokenExpiry, refreshTokenExpiry) VALUES (?, ?, ?, ?, ?)";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, username);
+            pstmt.setString(2, hashedAuthToken);
+            pstmt.setString(3, hashedRefreshToken);
+            pstmt.setString(4, authTokenExpiry);
+            pstmt.setString(5, refreshTokenExpiry);
+            pstmt.executeUpdate();
+        }
+    }
+
+    private String getExpirationDate(int minutes) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.MINUTE, minutes);
+        Date expiryDate = calendar.getTime();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        return sdf.format(expiryDate);
+    }
+
+    @GetMapping("/set-tokens")
+    @CrossOrigin(origins = "http://localhost:8000")
+    public String setTokens(HttpServletResponse response, @RequestHeader("Auth-Token") String authToken,
+            @RequestHeader("Refresh-Token") String refreshToken) {
+        ResponseCookie authTokenCookie = ResponseCookie.from("authToken", authToken)
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .maxAge(10 * 365 * 24 * 60 * 60)
+                .build();
+
+        ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", refreshToken)
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .maxAge(10 * 365 * 24 * 60 * 60)
+                .build();
+
+        // Add cookies to the response
+        response.addHeader("Set-Cookie", authTokenCookie.toString());
+        response.addHeader("Set-Cookie", refreshTokenCookie.toString());
+
+        return "HttpOnly cookies set";
     }
 }
