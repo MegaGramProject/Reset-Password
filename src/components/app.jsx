@@ -88,7 +88,7 @@ class App extends Component {
 
     sendLoginLink = (input) => {
         if(this.isValidEmail(input)) {
-            const apiUrl = "http://localhost:8002/sendLoginLink";
+            const apiUrl = "http://localhost:8003/sendLoginLink";
             const data = {"email": input}
             const options = {
                 method: "POST",
@@ -136,7 +136,7 @@ class App extends Component {
                 });;
     }
     else if(this.isValidNumber(input)) {
-        const apiUrl = "http://localhost:8002/sendLoginLink";
+        const apiUrl = "http://localhost:8003/sendLoginLink";
         const data = {"number": input}
         const options = {
             method: "POST",
@@ -184,7 +184,7 @@ class App extends Component {
 
     }
     else {
-        const apiUrl = "http://localhost:8002/sendLoginLink";
+        const apiUrl = "http://localhost:8003/sendLoginLink";
         const data = {"username": input}
         const options = {
             method: "POST",

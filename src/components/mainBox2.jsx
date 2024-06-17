@@ -1,19 +1,17 @@
 import React, { Component } from 'react';
-import lockSymbol from './images/lockSymbol.png';
 import './styles.css';
+var bcrypt = require('bcryptjs');
 
-class MainBox extends Component {
+class MainBox2 extends Component {
     constructor(props) {
         super(props);
-        console.log(props);
         this.state = {
-        troubleLoggingIn: "Trouble logging in?",
-        instructions: "Enter your email, phone, or username and we'll send you a link to get back into your account.",
-        inputPlaceholder: "Email, Phone, or Username",
-        buttonText: "Send login link",
-        orText: "OR",
-        createAccount: "Create new account",
-        backToLogin: "Back to login"
+        createAStrongPassword: "Create a Strong Password",
+        instructions: "Your password must be at-least 65% strong according to the password-strength bar.",
+        inputPlaceholder: "New Password",
+        inputPlaceholder2: "New Password, again",
+        buttonText: "Reset Password",
+        outputMessage: ""
         };
         this.handleChange = this.handleChange.bind(this);
         this.sendLoginLink = this.sendLoginLink.bind(this);
@@ -25,6 +23,7 @@ class MainBox extends Component {
         height: '43em',
         width: '33em',
         marginTop: '3em',
+        marginBottom: '40em'
     };
 
     lockSymbolStyle = {
@@ -198,14 +197,14 @@ translateTextPromise = async function(text, language1, language2){
     }
     }
 
-    async updateTroubleLoggingIn(currLang) {
+    async updateCreateAStrongPassword(currLang) {
         try {
             const translatedText = await this.translateTextPromise(
-                this.state.troubleLoggingIn,
+                this.state.createAStrongPassword,
                 currLang,
                 this.props.language
             );
-            this.setState({troubleLoggingIn: translatedText});
+            this.setState({createAStrongPassword: translatedText});
         } catch (error) {
             console.error("Translation failed", error);
         }
@@ -232,6 +231,19 @@ translateTextPromise = async function(text, language1, language2){
                 this.props.language
             );
             this.setState({inputPlaceholder: translatedText});
+        } catch (error) {
+            console.error("Translation failed", error);
+        }
+    }
+
+    async updateInputPlaceholder2(currLang) {
+        try {
+            const translatedText = await this.translateTextPromise(
+                this.state.inputPlaceholder2,
+                currLang,
+                this.props.language
+            );
+            this.setState({inputPlaceholder2: translatedText});
         } catch (error) {
             console.error("Translation failed", error);
         }
@@ -291,9 +303,10 @@ translateTextPromise = async function(text, language1, language2){
 
 
     async componentDidMount() {
-        await this.updateTroubleLoggingIn("English");
+        await this.updateCreateAStrongPassword("English");
         await this.updateInstructions("English");
         await this.updateInputPlaceholder("English");
+        await this.updateInputPlaceholder2("English");
         await this.updateButtonText("English");
         await this.updateOrText("English");
         await this.updateCreateAccount("English");
@@ -302,9 +315,10 @@ translateTextPromise = async function(text, language1, language2){
 
     async componentDidUpdate(prevProps, prevState) {
         if (prevProps.language !== this.props.language) {
-            await this.updateTroubleLoggingIn(prevProps.language);
+            await this.updateCreateAStrongPassword(prevProps.language);
             await this.updateInstructions(prevProps.language);
             await this.updateInputPlaceholder(prevProps.language);
+            await this.updateInputPlaceholder2(prevProps.language);
             await this.updateButtonText(prevProps.language);
             await this.updateOrText(prevProps.language);
             await this.updateCreateAccount(prevProps.language);
@@ -314,12 +328,88 @@ translateTextPromise = async function(text, language1, language2){
 
 
 
+    getHashedPassword = function(password, salt) {
+        return bcrypt.hashSync(password, salt);
+    }
+
+    resetPassword =  () => {
+        const createUserURL = "http://localhost:8001/updateUser/" + this.props.username;
+        const newSalt = bcrypt.genSaltSync(12);
+        const newHashedPassword =  bcrypt.hashSync(this.props.inputValue, newSalt);
+        const userData = {"salt":newSalt,"hashedPassword":newHashedPassword};
+        const headers  = {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(userData)
+        };
+        fetch(createUserURL, headers)
+        .then(response => {
+            if (!response.ok) {
+                this.setState({outputMessage: "The network response was not ok"});
+            }
+            else {
+                this.setState({outputMessage: "Your password has been changed successfully!"})
+                window.location.href = 'https://www.google.com';
+            }
+        }).catch(error => {
+            this.setState({outputMessage: "There was an issue connecting to the server"});
+        }
+        );
+    
+    }
+
+
+    onInputChange1 = (event) => {
+        const value = event.target.value;
+        const passwordStrength = this.getPasswordValidity(value);
+        this.props.onInputChange1(value, value===this.props.inputValue2 && passwordStrength>=0.65);
+        this.props.setPasswordStrength(passwordStrength);
+        if(value.length > 0 && this.props.passwordStrengthBarShown==false) {
+            this.props.toggleStrengthBar();
+        }
+        else if(value.length==0 && this.props.passwordStrengthBarShown==true) {
+            this.props.toggleStrengthBar();
+        }
+    }
+
+    onInputChange2 = (event) => {
+        const value = event.target.value;
+        this.props.onInputChange2(value, value===this.props.inputValue && this.getPasswordValidity(this.props.inputValue)>=0.65);
+    }
+
+    getPasswordValidity = function(passwordInput) {
+        if(passwordInput.length == 0 || passwordInput.length > 128) {
+            return 0;
+        }
+        const lengthWeight = 0.6;
+        const varietyWeight = 0.4;
+        
+        const lengthScore = Math.min(passwordInput.length / 20, 1);
+        
+        let varietyScore = 0;
+        if (/[a-z]/.test(passwordInput)) varietyScore += 0.25;
+        if (/[A-Z]/.test(passwordInput)) varietyScore += 0.25;
+        if (/[0-9]/.test(passwordInput)) varietyScore += 0.25;
+        if (/[^a-zA-Z0-9]/.test(passwordInput)) varietyScore += 0.25;
+    
+        const strengthScore = (lengthWeight * lengthScore) + (varietyWeight * varietyScore);
+    
+        return strengthScore;
+    }
+
+
+
+
     render() {
-        const sendLinkButtonStyle = {
+        const resetPasswordButtonStyle = {
             width: '30em',
-            height: '3em',
+            height: '4em',
             backgroundColor: this.props.isButtonEnabled ? '#347aeb' : '#82bbf5',
             cursor: this.props.isButtonEnabled ? 'pointer' : 'initial',
+            fontSize: '0.88em',
+            fontWeight: 'bold'
         };
 
 
@@ -327,41 +417,42 @@ translateTextPromise = async function(text, language1, language2){
         return (
                 <React.Fragment>
                 <div className="box" style={this.boxStyle}>
-                    <img src={lockSymbol} style={this.lockSymbolStyle} alt="Lock Symbol" />
-                    <p style={{ fontSize: '1.5em', fontWeight: 'bold', marginTop: '-3em' }}>{this.state.troubleLoggingIn}</p>
+                    <p style={{ fontSize: '1.5em', fontWeight: 'bold', marginTop: '0em' }}>{this.state.createAStrongPassword}</p>
                     <p style={{ color: '#828281', fontSize: '1.2em', width: '19em' }}>
                     {this.state.instructions}
                     </p>
                     <input
                         className="textInput"
-                        style={{ width: '23em', padding: '1.5em 1em' }}
-                        type="text"
+                        style={{ width: '23em', padding: '1.5em 1em', fontSize: '1.1em'}}
+                        type="password"
                         placeholder={this.state.inputPlaceholder}
-                        onChange={this.handleChange}
+                        onChange={this.onInputChange1}
                         value = {this.props.inputValue}
                     />
+                    <div id="passwordStrengthContainer" style={{width:"24.75em", height:"0.4375em", backgroundColor: "lightgray",
+                    display: this.props.passwordStrengthBarShown ? "inline-block" : "none", marginTop:"-2em"}}>
+                    <div id="passwordStrength" style={{width: this.props.passwordStrength,  height:"0.4375em", backgroundColor:"green"}}></div>
+                    </div>
+                    <input
+                        className="textInput"
+                        style={{ width: '23em', padding: '1.5em 1em', marginTop: '-1em', fontSize: '1.1em'}}
+                        type="password"
+                        placeholder={this.state.inputPlaceholder2}
+                        onChange={this.onInputChange2}
+                        value = {this.props.inputValue2}
+                    />
                     <button
-                        id="sendLinkButton"
                         className="blueButton"
-                        style={sendLinkButtonStyle}
-                        onClick = {this.props.isButtonEnabled ? this.sendLoginLink : null}>
+                        style={resetPasswordButtonStyle}
+                        onClick = {this.props.isButtonEnabled ? this.resetPassword : null}>
                         {this.state.buttonText}
                     </button>
+                    <p style={{fontSize:'small'}}>{this.state.outputMessage}</p>
                     <br />
-                    <div>
-                        <p className="orLine">_________________</p>
-                        <p className="OR">{this.state.orText}</p>
-                        <p className="orLine" style={{ marginLeft: '0.5em' }}>_________________</p>
-                    </div>
-                    <a href="http://localhost:8000/signUp" className="noUnderline" style={{ fontWeight: 'bold', fontSize: '1.2em', marginTop: '1em', color:'black'}}>{this.state.createAccount}</a>
-                    <br />
-                </div>
-                <div className="box" style={{ width: '36em', height: '3.2em', backgroundColor: '#f7f5f5', borderStyle: 'solid', borderColor: 'gray', marginBottom: '40em' }}>
-                    <a href="http://localhost:8000/login" className="noUnderline" style={{ fontWeight: 'bold', fontSize: '1.2em', color: 'black' }}>{this.state.backToLogin}</a>
                 </div>
                 </React.Fragment>
         );
     }
 }
 
-export default MainBox;
+export default MainBox2;
