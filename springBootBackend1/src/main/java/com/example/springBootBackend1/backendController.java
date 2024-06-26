@@ -24,8 +24,14 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -54,6 +60,9 @@ public class backendController {
     private static final SecureRandom secureRandom = new SecureRandom();
 
     private static final Base64.Encoder base64Encoder = Base64.getUrlEncoder().withoutPadding();
+
+    @Autowired
+    private ProfilePhotoRepository profilePhotoRepository;
 
     @PostMapping("/sendLoginLink")
     @CrossOrigin(origins = "http://localhost:3001")
@@ -259,68 +268,22 @@ public class backendController {
         return sdf.format(expiryDate);
     }
 
-    /*
-     * @GetMapping("/set-tokens")
-     * 
-     * @CrossOrigin(origins = "http://localhost:8000", allowedHeaders = "*",
-     * allowCredentials = "true")
-     * public String setTokens(HttpServletResponse
-     * response, @RequestHeader("Auth-Token") String authToken,
-     * 
-     * @RequestHeader("Refresh-Token") String
-     * refreshToken, @RequestHeader("Username") String username) {
-     * ResponseCookie authTokenCookie = ResponseCookie.from("authToken" + username,
-     * authToken)
-     * .httpOnly(true)
-     * .secure(false)
-     * .path("/")
-     * .maxAge(10 * 365 * 24 * 60 * 60)
-     * .build();
-     * 
-     * ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken" +
-     * username, refreshToken)
-     * .httpOnly(true)
-     * .secure(false)
-     * .path("/")
-     * .maxAge(10 * 365 * 24 * 60 * 60)
-     * .build();
-     * 
-     * response.addHeader("Set-Cookie", authTokenCookie.toString());
-     * response.addHeader("Set-Cookie", refreshTokenCookie.toString());
-     * 
-     * return "HttpOnly cookies set";
-     * }
-     * 
-     * @GetMapping("/unset-tokens")
-     * 
-     * @CrossOrigin(origins = "http://localhost:8000", allowedHeaders = "*",
-     * allowCredentials = "true")
-     * public String unsetTokens(HttpServletResponse
-     * response, @RequestHeader("Auth-Token") String authToken,
-     * 
-     * @RequestHeader("Refresh-Token") String
-     * refreshToken, @RequestHeader("Username") String username) {
-     * ResponseCookie authTokenCookie = ResponseCookie.from("authToken" + username,
-     * "")
-     * .httpOnly(true)
-     * .secure(false)
-     * .path("/")
-     * .maxAge(0)
-     * .build();
-     * 
-     * ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken" +
-     * username, "")
-     * .httpOnly(true)
-     * .secure(false)
-     * .path("/")
-     * .maxAge(0)
-     * .build();
-     * 
-     * response.addHeader("Set-Cookie", authTokenCookie.toString());
-     * response.addHeader("Set-Cookie", refreshTokenCookie.toString());
-     * 
-     * return "HttpOnly cookies unset";
-     * }
-     */
+    @GetMapping("/getProfilePhoto/{username}")
+    @CrossOrigin("http://localhost:3100")
+    public ResponseEntity<byte[]> getProfilePhoto(@PathVariable String username) {
+        ProfilePhoto profilePhoto = profilePhotoRepository.findByUsername(username);
+
+        if (profilePhoto == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        byte[] photo = profilePhoto.getProfilePhoto();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Content-Type", "image/png");
+        headers.set("Content-Length", String.valueOf(photo.length));
+
+        return new ResponseEntity<>(photo, headers, HttpStatus.OK);
+    }
 
 }
