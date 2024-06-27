@@ -64,6 +64,9 @@ public class backendController {
     @Autowired
     private ProfilePhotoRepository profilePhotoRepository;
 
+    @Autowired
+    private UserPostRepository userPostRepository;
+
     @PostMapping("/sendLoginLink")
     @CrossOrigin(origins = "http://localhost:3001")
     public String sendLoginLink(@RequestBody Map<String, String> request) {
@@ -284,6 +287,21 @@ public class backendController {
         headers.set("Content-Length", String.valueOf(photo.length));
 
         return new ResponseEntity<>(photo, headers, HttpStatus.OK);
+    }
+
+    @GetMapping("/getPosts/{username}")
+    @CrossOrigin("http://localhost:3100")
+    public ResponseEntity<UserPost[]> getPosts(@PathVariable String username) {
+        UserPost[] userPosts = userPostRepository.findByUsernamesContaining(username);
+
+        if (userPosts == null || userPosts.length == 0) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Content-Type", "application/json");
+
+        return new ResponseEntity<>(userPosts, headers, HttpStatus.OK);
     }
 
 }
