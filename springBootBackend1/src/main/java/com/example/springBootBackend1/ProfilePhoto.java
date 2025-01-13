@@ -1,4 +1,6 @@
 package com.example.springBootBackend1;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -6,7 +8,11 @@ import org.springframework.data.mongodb.core.mapping.Field;
 public class ProfilePhoto {
 
 
+    @Id
+    private String id;
+
     @Field("username")
+    @Indexed(unique = true)
     private String username;
 
     @Field("profilePhoto")

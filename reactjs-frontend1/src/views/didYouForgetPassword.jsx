@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
-import Footer from "./footer";
-import HeaderBar from "./headerBar";
-import MainBox from "./mainBox";
-import Popup from './popup';
-import './styles.css';
+import Footer from "../components/DidYouForgetPasswordPageComponents/footer";
+import HeaderBar from "../components/DidYouForgetPasswordPageComponents/headerBar";
+import MainBox from "../components/DidYouForgetPasswordPageComponents/mainBox";
+import Popup from '../components/DidYouForgetPasswordPageComponents/popup';
+import '../styles.css';
 
-class App extends Component {
+class DidYouForgetPassword extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -16,8 +16,10 @@ class App extends Component {
         popupHeader: "",
         popupMessage: ""
         };
+
         this.deletePopup = this.deletePopup.bind(this);
-        };
+        document.title = "Forgot Password?";
+    };
 
     changeLanguage = (newLanguage) =>  {
         this.setState({ language: newLanguage });
@@ -269,4 +271,5 @@ class App extends Component {
         );
     };
 }
-export default App;
+
+export default DidYouForgetPassword;

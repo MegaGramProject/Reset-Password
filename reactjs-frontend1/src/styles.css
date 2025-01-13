@@ -1,44 +1,42 @@
-/*Imports the font used in the actual Instagram Logo*/
 @font-face {
     font-family: Billabong;
-    src: url('fonts/billabong_regular.otf');
+    src: url('assets/fonts//billabong_regular.otf');
     font-weight: normal;
     font-style: normal;
 }
 
 /* Dark Mode */
 @media (prefers-color-scheme: dark) {
-body {
-        background-color: #232424;
-        color: white;
-}
-.dropbtn {
-    background-color: #232424 !important;
-}
+    body {
+            background-color: #232424;
+            color: white;
+    }
+    .dropbtn {
+        background-color: #232424 !important;
+    }
 
-.facebookGoogleYouTubeLogin {
-    color: #2499f2 !important;
-}
+    .facebookGoogleYouTubeLogin {
+        color: #2499f2 !important;
+    }
 
-#forgotPassword {
-    color: #2499f2 !important;
+    #forgotPassword {
+        color: #2499f2 !important;
 
-}
+    }
 
-.box {
-    border-color: rgb(52, 50, 50) !important;
-}
+    .box {
+        border-color: rgb(52, 50, 50) !important;
+    }
 
-.noUnderline {
-    color: #2499f2 !important;
-}
+    .noUnderline {
+        color: #2499f2 !important;
+    }
 
 
 
-.textInput {
-    background-color: lightgray !important;
-}
-
+    .textInput {
+        background-color: lightgray !important;
+    }
 }
 
 body {
@@ -51,10 +49,7 @@ body {
     font-family: Billabong;
     font-size: 55px;
     font-weight:100;
-    -webkit-user-select: none; /* Safari */
-    -moz-user-select: none;    /* Firefox */
-    -ms-user-select: none;     /* Internet Explorer/Edge */
-    user-select: none;         /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
+    user-select: none; 
     cursor: pointer;
 }
 
@@ -200,7 +195,6 @@ font-size: 13px;
 
 }
 
-  /* Links inside the dropdown */
 .dropdown-content p {
     color: black;
     padding: 6px 10px;
@@ -285,15 +279,13 @@ font-size: 13px;
     object-fit: cover;
 }
 
-/* Visited link */
 .noUnderline:visited {
     color: darkblue;
 }
 
 select {
     appearance: none;
-    -webkit-appearance: none;
-    background: white url('images/dropdownV.png') no-repeat right 10px center;
+    background: white url('./assets/images/dropdownV.png') no-repeat right 10px center;
     background-size: 16px 16px;
     padding: 7px 8px;
     background-color: #fff;

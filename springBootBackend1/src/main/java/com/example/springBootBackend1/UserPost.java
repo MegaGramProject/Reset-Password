@@ -1,7 +1,6 @@
 package com.example.springBootBackend1;
 
 import java.util.Date;
-import java.util.List;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -20,13 +19,19 @@ public class UserPost {
     private byte[][] posts;
 
     @Field("taggedAccounts")
-    private List<Object> taggedAccounts;
+    private Object[][][] taggedAccounts;
 
     @Field("locationOfPost")
     private String locationOfPost;
 
     @Field("dateTimeOfPost")
     private Date dateTimeOfPost;
+
+    @Field("slides")
+    private int[] slides;
+
+    @Field("category")
+    private String category;
 
     public String getId() {
         return id;
@@ -52,11 +57,11 @@ public class UserPost {
         this.posts = posts;
     }
 
-    public List<Object> getTaggedAccounts() {
+    public Object[][][] getTaggedAccounts() {
         return taggedAccounts;
     }
 
-    public void setTaggedAccounts(List<Object> taggedAccounts) {
+    public void setTaggedAccounts(Object[][][] taggedAccounts) {
         this.taggedAccounts = taggedAccounts;
     }
 
@@ -74,5 +79,21 @@ public class UserPost {
 
     public void setDateTimeOfPost(Date dateTimeOfPost) {
         this.dateTimeOfPost = dateTimeOfPost;
+    }
+
+    public int[] getSlides() {
+        return slides;
+    }
+
+    public void setSlides(int[] slides) {
+        this.slides = slides;
+    }
+    
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
     }
 }

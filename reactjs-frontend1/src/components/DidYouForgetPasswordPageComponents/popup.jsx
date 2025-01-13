@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import './styles.css';
 
 class Popup extends Component {
     constructor(props) {
@@ -13,10 +12,8 @@ class Popup extends Component {
         };
 
     removePopup(){
-            this.props.deletePopup();
-        };
-
-
+        this.props.deletePopup();
+    };
 
 
     translateTextPromise = async (text, language1, language2) => {

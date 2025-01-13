@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import dropdownV from './images/dropdownV.png';
-import './styles.css';
+import dropdownV from '../../assets/images/dropdownV.png';
 
 class Footer extends Component {
     constructor(props) {

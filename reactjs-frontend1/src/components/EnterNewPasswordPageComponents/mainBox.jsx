@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
-import './styles.css';
 var bcrypt = require('bcryptjs');
 
-class MainBox2 extends Component {
+class MainBox extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -351,7 +350,7 @@ translateTextPromise = async function(text, language1, language2){
             }
             else {
                 this.setState({outputMessage: "Your password has been changed successfully!"})
-                window.location.href = 'https://www.google.com';
+                window.location.href = 'http://localhost:3100/'+this.props.username;
             }
         }).catch(error => {
             this.setState({outputMessage: "There was an issue connecting to the server"});
@@ -455,4 +454,4 @@ translateTextPromise = async function(text, language1, language2){
     }
 }
 
-export default MainBox2;
+export default MainBox;

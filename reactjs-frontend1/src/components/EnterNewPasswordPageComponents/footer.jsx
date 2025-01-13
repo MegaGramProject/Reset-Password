@@ -1,34 +1,16 @@
 import React, { Component } from 'react';
-import './styles.css';
+import dropdownV from '../../assets/images/dropdownV.png';
 
-class HeaderBar2 extends Component {
+class Footer extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            loginText: "Log in",
-            signupText: "Sign up"
+            footnoteText: "An enhanced version of Instagram, created as a personal project and powered by Rishav Ray"
         };
-        };
-
-    headingStyle = {
-        fontFamily: 'Billabong',
-        fontSize: '2.4em',
-        };
-    
-    loginButtonStyle = {
-        width: '6em',
-        height: '3em',
-        backgroundColor: '#2189eb',
-        fontSize: '0.7em'
     }
 
-    signupButtonStyle = {
-        width: '6em',
-        height: '3em',
-        backgroundColor: 'white',
-        color: "#2189eb",
-        fontSize: '0.7em'
-        
+    changeLanguage = (newLanguage) =>  {
+        this.props.changeLanguage(newLanguage);
     }
 
     translateTextPromise = async function(text, language1, language2){
@@ -127,72 +109,67 @@ class HeaderBar2 extends Component {
             }
             return response.json()['data']['translations']['translatedText'];
         }
-    
+
         catch (error) {
             console.error('Error:', error);
             return "T";
         }
-        }
-    
-        async updateLoginText(currLang) {
-            try {
-                const translatedText = await this.translateTextPromise(
-                    this.state.loginText,
-                    currLang,
-                    this.props.language
-                );
-                this.setState({loginText: translatedText});
-            } catch (error) {
-                console.error("Translation failed", error);
-            }
-        }
-    
-        async updateSignupText(currLang) {
-            try {
-                const translatedText = await this.translateTextPromise(
-                    this.state.signupText,
-                    currLang,
-                    this.props.language
-                );
-                this.setState({signupText: translatedText});
-            } catch (error) {
-                console.error("Translation failed", error);
-            }
-        }
-
-        async componentDidMount() {
-            await this.updateLoginText("English");
-            await this.updateSignupText("English");
-        }
-        
-        async componentDidUpdate(prevProps, prevState) {
-            if (prevProps.language !== this.props.language) {
-                await this.updateLoginText(prevProps.language);
-                await this.updateSignupText(prevProps.language);
-            }
-        }
-
-    takeUserToLogin = () => {
-        window.location.href = "http://localhost:8000/login";
     }
 
-    takeUserToSignup = () => {
-        window.location.href = "http://localhost:8000/signUp";
+    async updateFootnoteText(currLang) {
+        try {
+            const translatedText = await this.translateTextPromise(
+                this.state.footnoteText,
+                currLang,
+                this.props.language
+            );
+            this.setState({ footnoteText: translatedText });
+        } catch (error) {
+            console.error("Translation failed", error);
+        }
     }
+
+    async componentDidMount() {
+        await this.updateFootnoteText("English");
+    }
+    
+    async componentDidUpdate(prevProps, prevState) {
+        if (prevProps.language !== this.props.language) {
+            await this.updateFootnoteText(prevProps.language);
+        }
+    }
+    
 
     render() {
         return (
             <React.Fragment>
-            <div style={{display:'flex', justifyContent:'space-around', alignItems: 'end', paddingTop: '0.6em'}}>
-            <h3 className="headerMegagram" onClick={this.takeUserToLogin} style={this.headingStyle}><span style={{cursor:'pointer'}}>Megagram</span></h3>
-            <div style={{display:'flex', justifyContent:'space-between', paddingBottom:'0.25em'}}>
-            <button onClick={this.takeUserToLogin} className="blueButton" style={this.loginButtonStyle}>{this.state.loginText}</button>
-            <button onClick={this.takeUserToSignup} className="blueButton" style={this.signupButtonStyle}>{this.state.signupText}</button>
-            </div>
-            </div>
-            <hr />
+                <footer id="footnote" className="footnote">{this.state.footnoteText}</footer>
+                <div className="dropdown">
+                <button className="dropbtn">
+                        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.1em' }}>
+                            <span id="language" style={{fontSize:'1.2em'}}>{this.props.language}</span>
+                            <img className="dropdownV" src={dropdownV} style={{ marginTop: '0em' }} alt="Dropdown" />
+                        </div>
+                </button>
+                <div id="languageList" className="dropdown-content">
+                        <p onClick={() => this.changeLanguage('العربية')}>العربية</p>
+                        <p onClick={() => this.changeLanguage('বাংলা')}>বাংলা</p>
+                        <p onClick={() => this.changeLanguage('Deutsch')}>Deutsch</p>
+                        <p onClick={() => this.changeLanguage('English')}>English</p>
+                        <p onClick={() => this.changeLanguage('Español')}>Español</p>
+                        <p onClick={() => this.changeLanguage('Français')}>Français</p>
+                        <p onClick={() => this.changeLanguage('हिंदी')}>हिंदी</p>
+                        <p onClick={() => this.changeLanguage('Bahasa Indonesia')}>Bahasa Indonesia</p>
+                        <p onClick={() => this.changeLanguage('Italiano')}>Italiano</p>
+                        <p onClick={() => this.changeLanguage('日本語')}>日本語</p>
+                        <p onClick={() => this.changeLanguage('Русский')}>Русский</p>
+                        <p onClick={() => this.changeLanguage('中国人')}>中国人</p>
+                </div>
+                </div>
             </React.Fragment>
         );
-    };
+    }
 }
-export default HeaderBar2;
+
+
+export default Footer;

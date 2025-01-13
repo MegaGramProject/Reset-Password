@@ -1,5 +1,5 @@
 package com.example.springBootBackend1;
-
+import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -8,12 +8,19 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
+import java.util.Set;
 
 import javax.mail.Message;
 import javax.mail.Multipart;
@@ -26,21 +33,43 @@ import javax.mail.internet.MimeMultipart;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.twilio.Twilio;
 import com.twilio.type.PhoneNumber;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+
 @RestController
 public class backendController {
+
+
+
+    private HttpServletRequest request;
+    private HttpServletResponse response;
+    private final ResourceLoader resourceLoader;
+
+    public backendController(HttpServletRequest request, HttpServletResponse response, ResourceLoader resourceLoader) {
+        this.request = request;
+        this.response = response;
+        this.resourceLoader = resourceLoader;
+    }
 
     @Value("${spring.datasource.url}")
     private String dbUrl;
@@ -66,6 +95,9 @@ public class backendController {
 
     @Autowired
     private UserPostRepository userPostRepository;
+
+    @Autowired
+    private VideoMetadataRepository videoMetadataRepository;
 
     @PostMapping("/sendLoginLink")
     @CrossOrigin(origins = "http://localhost:3001")
@@ -207,9 +239,9 @@ public class backendController {
                 .creator(new PhoneNumber(number), new PhoneNumber(twilioPhoneNumber), messageBody).create();
     }
 
-    @PostMapping("/getTokens")
-    @CrossOrigin(origins = "http://localhost:8000")
-    public String getTokens(@RequestBody Map<String, String> request) {
+    @PostMapping("/cookies/getTokens")
+    @CrossOrigin(origins = "http://localhost:8000", allowCredentials = "true")
+    public String getTokens(@RequestBody Map<String, String> request, HttpServletResponse response) {
         try (Connection connection = DriverManager.getConnection(dbUrl, dbUsername, dbPassword)) {
             if (request.containsKey("username")) {
                 String username = request.get("username");
@@ -225,7 +257,21 @@ public class backendController {
                 updateDatabase(connection, username, hashedAuthToken, hashedRefreshToken, authTokenSalt,
                         refreshTokenSalt, authTokenExpiry,
                         refreshTokenExpiry);
-                return "{\"token\": \"" + authToken + "\", \"refreshToken\": \"" + refreshToken + "\"}";
+
+                Cookie cookie = new Cookie("authToken" + username, authToken);
+                cookie.setMaxAge(2628288);
+                cookie.setPath("/cookies");
+                cookie.setHttpOnly(true);
+
+                Cookie cookie2 = new Cookie("refreshToken" + username, refreshToken);
+                cookie2.setMaxAge(2628288);
+                cookie2.setPath("/cookies");
+                cookie2.setHttpOnly(true);
+
+                response.addCookie(cookie);
+                response.addCookie(cookie2);
+
+                return "Cookies set successfully";
             } else {
                 return "{\"error\": \"Invalid request\"}";
             }
@@ -272,7 +318,8 @@ public class backendController {
     }
 
     @GetMapping("/getProfilePhoto/{username}")
-    @CrossOrigin("http://localhost:3100")
+    @CrossOrigin({"http://localhost:3100", "http://localhost:8011", "http://localhost:8019", "http://localhost:8024",
+    "http://localhost:8033"})
     public ResponseEntity<byte[]> getProfilePhoto(@PathVariable String username) {
         ProfilePhoto profilePhoto = profilePhotoRepository.findByUsername(username);
 
@@ -289,19 +336,532 @@ public class backendController {
         return new ResponseEntity<>(photo, headers, HttpStatus.OK);
     }
 
-    @GetMapping("/getPosts/{username}")
-    @CrossOrigin("http://localhost:3100")
-    public ResponseEntity<UserPost[]> getPosts(@PathVariable String username) {
-        UserPost[] userPosts = userPostRepository.findByUsernamesContaining(username);
+    @PostMapping("/getProfilePhotosOfMultipleUsers")
+    @CrossOrigin({"http://localhost:8019"})
+    public ResponseEntity<Map<String, byte[]>> getProfilePhotosOfMultipleUsers(@RequestBody Map<String, String[]> request) {
+        if (request.containsKey("listOfUsers")) {
+            String[] usernames = request.get("listOfUsers");
+            Map<String, byte[]> profilePhotosMap = new HashMap<>();
+            
+            for (String username : usernames) {
+                if(!profilePhotosMap.containsKey(username)) {
+                    ProfilePhoto profilePhoto = profilePhotoRepository.findByUsername(username);
+                
+                    if (profilePhoto != null) {
+                        byte[] photo = profilePhoto.getProfilePhoto();
+                        profilePhotosMap.put(username, photo);
+                    } else {
+                        profilePhotosMap.put(username, null);
+                    }
+                }
+            }
+            
+            return new ResponseEntity<>(profilePhotosMap, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
 
-        if (userPosts == null || userPosts.length == 0) {
+    @PatchMapping("/editProfilePhoto/{username}")
+    @CrossOrigin({"http://localhost:8019"})
+    public ResponseEntity<Void> editProfilePhoto(@RequestParam("newProfilePhoto") MultipartFile newProfilePhoto, @PathVariable String username) {
+        
+        ProfilePhoto profilePhoto = profilePhotoRepository.findByUsername(username);
+        
+        if (profilePhoto == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+        
+        try {
+            profilePhoto.setPhoto(newProfilePhoto.getBytes());
+            profilePhotoRepository.save(profilePhoto);
+        } catch (IOException e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @CrossOrigin(origins = "http://localhost:8019")
+    @GetMapping("/images/defaultPfp.png")
+    public ResponseEntity<Resource> getImage() {
+        Resource resource = resourceLoader.getResource("classpath:static/images/defaultPfp.png");
+        return ResponseEntity.ok(resource);
+    }
+
+
+    @GetMapping("/getPosts/{username}")
+    @CrossOrigin({"http://localhost:3100", "http://localhost:8019"})
+    public ResponseEntity<UserPost[]> getPosts(@PathVariable String username) {
+        UserPost[] userPosts = userPostRepository.findByUsernamesContaining(username);
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", "application/json");
 
         return new ResponseEntity<>(userPosts, headers, HttpStatus.OK);
+    }
+
+    @GetMapping("/getTaggedPosts/{username}")
+    @CrossOrigin({"http://localhost:8019"})
+    public ResponseEntity<ArrayList<Map<String, Object>>> getTaggedPosts(@PathVariable String username) {
+        UserPost[] userPosts = userPostRepository.findByTaggedAccountsContaining(username);
+        
+        ArrayList<Map<String, Object>> output = new ArrayList<>();
+        
+        for (UserPost userPost : userPosts) {
+            Object[][][] taggedAccountsOfPost = userPost.getTaggedAccounts();
+            
+            for (int i = 0; i < taggedAccountsOfPost.length; i++) {
+                Object[][] taggedAccountsOfCurrSlide = taggedAccountsOfPost[i];
+                
+                if (isUserTaggedInSlide(taggedAccountsOfCurrSlide, username)) {
+                    Map<String, Object> postDetails = new HashMap<>();
+                    postDetails.put("smallestSlideNumberWhereUserIsTagged", userPost.getSlides()[i]);
+                    postDetails.put("dateTimeOfPost", userPost.getDateTimeOfPost());
+                    postDetails.put("postId", userPost.getId());
+                    postDetails.put("slideImage", userPost.getPosts()[i]);
+                    
+                    output.add(postDetails);
+                    
+                    break;
+                }
+            }
+        }
+
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Content-Type", "application/json");
+    
+        return new ResponseEntity<>(output, headers, HttpStatus.OK);
+    }
+
+
+    private boolean isUserTaggedInSlide(Object[][] taggedAccountsOfSlide, String username) {
+        for (Object[] taggedAccount : taggedAccountsOfSlide) {
+            if (taggedAccount[2].equals(username)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @GetMapping("/getPostInfo/{postId}")
+    @CrossOrigin("http://localhost:3100")
+    public ResponseEntity<Object[]> getPostInfo(@PathVariable String postId) {
+        Optional<UserPost> userPostsOptional = userPostRepository.findById(postId);
+        VideoMetadata[] videosMetadata = videoMetadataRepository.findByOverallPostId(postId);
+
+        Object[] output = new Object[2];
+
+        if (userPostsOptional.isPresent()) {
+            output[0] = userPostsOptional.get();
+            ((UserPost) output[0]).setPosts(null);
+        } else {
+            output[0] = null;
+        }
+
+        output[1] = videosMetadata;
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Content-Type", "application/json");
+
+        return new ResponseEntity<>(output, headers, HttpStatus.OK);
+    }
+
+    @GetMapping("/getInDepthPostInfo/{postId}")
+    @CrossOrigin({"http://localhost:8019"})
+    public ResponseEntity<Object[]> getInDepthPostInfo(@PathVariable String postId) {
+        Optional<UserPost> userPostsOptional = userPostRepository.findById(postId);
+        VideoMetadata[] videosMetadata = videoMetadataRepository.findByOverallPostId(postId);
+
+        Object[] output = new Object[2];
+
+        if (userPostsOptional.isPresent()) {
+            output[0] = userPostsOptional.get();
+        } else {
+            output[0] = null;
+        }
+
+        output[1] = videosMetadata;
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Content-Type", "application/json");
+
+        return new ResponseEntity<>(output, headers, HttpStatus.OK);
+    }
+
+    @PostMapping("/getPostsForMultiplePostIds")
+    @CrossOrigin({"http://localhost:8019"})
+    public ResponseEntity<Map<String, Map<String, Object>>> getPostsForMultiplePostIds(@RequestBody Map<String, String[]> request) {
+        if (request.containsKey("postIds")) {
+            String[] postIds = request.get("postIds");
+            Map<String, Map<String, Object>> postIdToPostInfoMappings = new HashMap<>();
+            
+            for (String postId : postIds) {
+                Optional<UserPost> userPostOptional = userPostRepository.findById(postId);
+                if(userPostOptional.isPresent()) {
+                    UserPost userPost = userPostOptional.get();
+                    Map<String, Object> userPostInfo = new HashMap<>();
+                    userPostInfo.put("dateTimeOfPost", userPost.getDateTimeOfPost());
+                    userPostInfo.put("base64StringOfImageWithSmallestSlideNumber", userPost.getPosts()[0]);
+                    userPostInfo.put("smallestSlideNumber", userPost.getSlides()[0]);
+                    userPostInfo.put("hasMoreThanOneSlide", userPost.getSlides().length>1);
+                    userPostInfo.put("usernames", userPost.getUsernames());
+                    postIdToPostInfoMappings.put(postId, userPostInfo);
+                }
+                
+            }
+            
+            return new ResponseEntity<>(postIdToPostInfoMappings, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("/getPostsRelatedToTopic/{topic}")
+    @CrossOrigin({"http://localhost:8019"})
+    public ResponseEntity<?> getPostsRelatedToTopic(@RequestBody Map<String, String[]> request, @PathVariable String topic) {
+        if (request.containsKey("postIds")) {
+            String[] postIds = request.get("postIds"); //this is a listOfPostIds of userPosts whose captions hashtag the topic
+            Map<String, Map<String, Object>> postIdToPostInfoMappings = new HashMap<>();
+            Set<String> setOfPostIds = new HashSet<>();
+            
+            for (String postId : postIds) {
+                Optional<UserPost> userPostOptional = userPostRepository.findById(postId);
+                if(userPostOptional.isPresent()) {
+                    UserPost userPost = userPostOptional.get();
+                    Map<String, Object> userPostInfo = new HashMap<>();
+                    userPostInfo.put("dateTimeOfPost", userPost.getDateTimeOfPost());
+                    userPostInfo.put("base64StringOfImageWithSmallestSlideNumber", userPost.getPosts()[0]);
+                    userPostInfo.put("smallestSlideNumber", userPost.getSlides()[0]);
+                    userPostInfo.put("hasMoreThanOneSlide", userPost.getSlides().length>1);
+                    userPostInfo.put("usernames", userPost.getUsernames());
+                    postIdToPostInfoMappings.put(postId, userPostInfo);
+                    setOfPostIds.add(postId);
+                }
+                
+            }
+
+            UserPost[] userPostsCategorizedAsTopic = userPostRepository.findByCategory(topic);
+
+            for(UserPost post : userPostsCategorizedAsTopic) {
+                if(!setOfPostIds.contains(post.getId())) {
+                    Map<String, Object> userPostInfo = new HashMap<>();
+                    userPostInfo.put("dateTimeOfPost", post.getDateTimeOfPost());
+                    userPostInfo.put("base64StringOfImageWithSmallestSlideNumber", post.getPosts()[0]);
+                    userPostInfo.put("smallestSlideNumber", post.getSlides()[0]);
+                    userPostInfo.put("hasMoreThanOneSlide", post.getSlides().length>1);
+                    userPostInfo.put("usernames", post.getUsernames());
+                    postIdToPostInfoMappings.put(post.getId(), userPostInfo);
+                    setOfPostIds.add(post.getId());
+                }
+            }
+
+            return new ResponseEntity<>(postIdToPostInfoMappings, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping("/getSingleSlideOfPost/{postId}/{slideNumber}")
+    @CrossOrigin({"http://localhost:8019"})
+    public ResponseEntity<Map<String,Object>> getSingleSlideOfPost(@PathVariable String postId, @PathVariable int slideNumber) {
+        Map<String, Object> output = new HashMap<String, Object>();
+        Optional<UserPost> userPostsOptional = userPostRepository.findById(postId);
+
+        if (userPostsOptional.isPresent()) {
+            UserPost userPost = userPostsOptional.get();
+            int[] userPostSlides = userPost.getSlides();
+            for(int i=0; i<userPostSlides.length; i++) {
+                if(userPostSlides[i]==slideNumber) {
+                    output.put("imgData", userPost.getPosts()[i]);
+                    return new ResponseEntity<>(output, HttpStatus.OK);
+                }
+                else if(userPostSlides[i]>slideNumber) {
+                    break;
+                }
+            }
+        }
+
+
+        VideoMetadata[] videosMetadata = videoMetadataRepository.findByOverallPostId(postId);
+        for(VideoMetadata vidMetadata: videosMetadata) {
+            if(vidMetadata.getSlideNumber()==slideNumber) {
+                output.put("videoId", vidMetadata.getVideoId());
+                return new ResponseEntity<>(output, HttpStatus.OK);
+            }
+        }
+
+        return new ResponseEntity<>(output, HttpStatus.OK);
+    }
+
+    private boolean authTokenIsValidated(Connection connection, String authToken, String username) {
+        String sql = "SELECT authTokenSalt, hashedAuthToken, authTokenExpiry  FROM userTokens WHERE username = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, username);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                String authTokenSalt = rs.getString("authTokenSalt");
+                String hashedAuthToken = rs.getString("hashedAuthToken");
+                Timestamp authTokenExpiry = rs.getTimestamp("authTokenExpiry");
+                LocalDateTime expiryDateTime = authTokenExpiry.toLocalDateTime();
+                if (expiryDateTime.isBefore(LocalDateTime.now())) {
+                    return false;
+                }
+                String expectedHashedAuthToken = hashToken(authToken + authTokenSalt);
+                return expectedHashedAuthToken.equals(hashedAuthToken);
+            } else {
+                return false;
+            }
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private boolean refreshTokenIsValidated(Connection connection, String refreshToken, String username) {
+        String sql = "SELECT refreshTokenSalt, hashedRefreshToken, refreshTokenExpiry FROM userTokens WHERE username = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, username);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                String refreshTokenSalt = rs.getString("refreshTokenSalt");
+                String hashedRefreshToken = rs.getString("hashedRefreshToken");
+                Timestamp refreshTokenExpiry = rs.getTimestamp("refreshTokenExpiry");
+                LocalDateTime expiryDateTime = refreshTokenExpiry.toLocalDateTime();
+                if (expiryDateTime.isBefore(LocalDateTime.now())) {
+                    return false;
+                }
+                String expectedHashedRefreshToken = hashToken(refreshToken + refreshTokenSalt);
+                return expectedHashedRefreshToken.equals(hashedRefreshToken);
+            } else {
+                return false;
+            }
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    @GetMapping("/cookies/authenticateUser/{username}")
+    @CrossOrigin(origins = {"http://localhost:3100", "http://localhost:8007", "http://localhost:8011", "http://localhost:8019"}, allowCredentials = "true")
+    public Boolean authenticateUser(@PathVariable String username, HttpServletRequest request) {
+        try {
+            Cookie[] cookies = request.getCookies();
+            if (cookies != null) {
+                for (Cookie cookie : cookies) {
+                    if (cookie.getName().equals("authToken" + username)) {
+                        String authToken = cookie.getValue();
+                        Connection connection = DriverManager.getConnection(dbUrl, dbUsername, dbPassword);
+                        if (authTokenIsValidated(connection, authToken, username)) {
+                            return true;
+                        }
+                        return false;
+                    }
+                }
+            }
+            return false;
+
+        } catch (Exception e) {
+            return false;
+        }
+
+    }
+
+    @PostMapping("/cookies/updateAuthToken")
+    @CrossOrigin(origins = {"http://localhost:3100", "http://localhost:8007", "http://localhost:8011", "http://localhost:8019"}, allowCredentials = "true")
+    public String updateAuthToken(@RequestBody Map<String, String> request, HttpServletRequest servletRequest,
+            HttpServletResponse response) throws Exception {
+        if (request.containsKey("username")) {
+            String username = request.get("username");
+            Cookie[] cookies = servletRequest.getCookies();
+            if (cookies == null) {
+                return "Refresh token of username not found";
+            }
+            Connection connection = DriverManager.getConnection(dbUrl, dbUsername, dbPassword);
+            boolean refreshTokenFound = false;
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals("refreshToken" + username)) {
+                    refreshTokenFound = true;
+                    if (refreshTokenIsValidated(connection, cookie.getValue(), username)) {
+                        break;
+                    } else {
+                        return "Invalid refresh token for username";
+                    }
+                }
+            }
+            if (!refreshTokenFound) {
+                return "Refresh token of username not found";
+            }
+            String newAuthToken = generateToken(100);
+            String newAuthTokenSalt = generateToken(32);
+            String newHashedAuthToken = hashToken(newAuthToken + newAuthTokenSalt);
+            String newAuthTokenExpiry = getExpirationDate(45);
+            String sql = "UPDATE userTokens SET hashedAuthToken = ?, authTokenSalt = ?, authTokenExpiry=? WHERE username = ?;";
+            try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+                pstmt.setString(1, newHashedAuthToken);
+                pstmt.setString(2, newAuthTokenSalt);
+                pstmt.setString(3, newAuthTokenExpiry);
+                pstmt.setString(4, username);
+                pstmt.executeUpdate();
+                Cookie cookie = new Cookie("authToken" + username, newAuthToken);
+                cookie.setMaxAge(2628288);
+                cookie.setPath("/cookies");
+                cookie.setHttpOnly(true);
+                response.addCookie(cookie);
+                return "Cookie updated successfully";
+            } catch (Exception e) {
+                return "Auth token was not updated successfully";
+            }
+        } else {
+            return "{\"error\": \"Invalid request\"}";
+        }
+    }
+
+    @PostMapping("/cookies/updateRefreshToken")
+    @CrossOrigin(origins = {"http://localhost:3100", "http://localhost:8007", "http://localhost:8011", "http://localhost:8019"}, allowCredentials = "true")
+    public String updateRefreshToken(@RequestBody Map<String, String> request, HttpServletRequest servletRequest,
+            HttpServletResponse response) throws Exception {
+        if (request.containsKey("username")) {
+            String username = request.get("username");
+            Cookie[] cookies = servletRequest.getCookies();
+            if (cookies == null) {
+                return "Refresh token of username not found";
+            }
+            boolean refreshTokenFound = false;
+            Connection connection = DriverManager.getConnection(dbUrl, dbUsername, dbPassword);
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals("refreshToken" + username)) {
+                    refreshTokenFound = true;
+                    if (refreshTokenIsOutdated(connection, cookie.getValue(), username)) {
+                        break;
+                    } else {
+                        return "Refresh token for username hasn't expired";
+                    }
+                }
+            }
+            if (!refreshTokenFound) {
+                return "Refresh token of username not found";
+            }
+            String newRefreshToken = generateToken(100);
+            String newRefreshTokenSalt = generateToken(32);
+            String newHashedRefreshToken = hashToken(newRefreshToken + newRefreshTokenSalt);
+            String newRefreshTokenExpiry = getExpirationDate(4320);
+            String sql = "UPDATE userTokens SET hashedRefreshToken = ?, refreshTokenSalt = ?, refreshTokenExpiry=? WHERE username = ?;";
+            try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+                pstmt.setString(1, newHashedRefreshToken);
+                pstmt.setString(2, newRefreshTokenSalt);
+                pstmt.setString(3, newRefreshTokenExpiry);
+                pstmt.setString(4, username);
+                pstmt.executeUpdate();
+                Cookie cookie = new Cookie("refreshToken" + username, newRefreshToken);
+                cookie.setMaxAge(2628288);
+                cookie.setPath("/cookies");
+                cookie.setHttpOnly(true);
+                response.addCookie(cookie);
+                return "Cookie updated successfully";
+            } catch (Exception e) {
+                return "Refresh token was not updated successfully";
+            }
+        } else {
+            return "{\"error\": \"Invalid request\"}";
+        }
+    }
+
+    private boolean refreshTokenIsOutdated(Connection connection, String refreshToken, String username) {
+        String sql = "SELECT refreshTokenExpiry FROM userTokens WHERE refreshToken=?, username=?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                Timestamp refreshTokenExpiry = rs.getTimestamp("refreshTokenExpiry");
+                LocalDateTime expiryDateTime = refreshTokenExpiry.toLocalDateTime();
+                if (expiryDateTime.isBefore(LocalDateTime.now())) {
+                    return true;
+                }
+                return false;
+            } else {
+                return false;
+            }
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    @PostMapping("/cookies/removeTokens")
+    @CrossOrigin(origins = "http://localhost:3100", allowCredentials = "true")
+    public String removeTokens(@RequestBody Map<String, String> request, HttpServletResponse response) {
+        if (request.containsKey("username")) {
+            String username = request.get("username");
+            Cookie cookie = new Cookie("authToken" + username, null);
+            cookie.setMaxAge(0);
+            cookie.setPath("/cookies");
+            response.addCookie(cookie);
+            Cookie cookie2 = new Cookie("refreshToken" + username, null);
+            cookie2.setMaxAge(0);
+            cookie2.setPath("/cookies");
+            response.addCookie(cookie2);
+            return "Successfully logged out";
+        } else {
+            return "Username not provided";
+        }
+
+    }
+
+    @PostMapping("/cookies/getTokensAfterLogin")
+    @CrossOrigin(origins = "http://localhost:8000", allowCredentials = "true")
+    public String getTokensAfterLogin(@RequestBody Map<String, String> request, HttpServletRequest request2,
+            HttpServletResponse response) {
+        try (Connection connection = DriverManager.getConnection(dbUrl, dbUsername, dbPassword)) {
+            if (request.containsKey("username")) {
+                String username = request.get("username");
+                String authToken = generateToken(100);
+                String refreshToken = generateToken(100);
+                String authTokenSalt = generateToken(32);
+                String refreshTokenSalt = generateToken(32);
+                String authTokenExpiry = getExpirationDate(45);
+                String refreshTokenExpiry = getExpirationDate(4320);
+                String hashedAuthToken = hashToken(authToken + authTokenSalt);
+                String hashedRefreshToken = hashToken(refreshToken + refreshTokenSalt);
+
+                updateDatabaseAfterLogin(connection, username, hashedAuthToken, hashedRefreshToken, authTokenSalt,
+                        refreshTokenSalt, authTokenExpiry,
+                        refreshTokenExpiry);
+
+                Cookie cookie = new Cookie("authToken" + username, authToken);
+                cookie.setMaxAge(2628288);
+                cookie.setPath("/cookies");
+                cookie.setHttpOnly(true);
+
+                Cookie cookie2 = new Cookie("refreshToken" + username, refreshToken);
+                cookie2.setMaxAge(2628288);
+                cookie2.setPath("/cookies");
+                cookie2.setHttpOnly(true);
+
+                response.addCookie(cookie);
+                response.addCookie(cookie2);
+
+                return "Cookies set successfully";
+            } else {
+                return "{\"error\": \"Invalid request\"}";
+            }
+
+        } catch (Exception e) {
+            return "{\"error\": \"Internal server error\"}";
+        }
+    }
+
+    private void updateDatabaseAfterLogin(Connection connection, String username, String hashedAuthToken,
+            String hashedRefreshToken, String authTokenSalt, String refreshTokenSalt, String authTokenExpiry,
+            String refreshTokenExpiry) throws Exception {
+        String sql = "UPDATE userTokens SET hashedAuthToken=?, hashedRefreshToken=?, authTokenSalt=?, refreshTokenSalt=?, authTokenExpiry=?, refreshTokenExpiry=? WHERE username = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, hashedAuthToken);
+            pstmt.setString(2, hashedRefreshToken);
+            pstmt.setString(3, authTokenSalt);
+            pstmt.setString(4, refreshTokenSalt);
+            pstmt.setString(5, authTokenExpiry);
+            pstmt.setString(6, refreshTokenExpiry);
+            pstmt.setString(7, username);
+            pstmt.executeUpdate();
+        }
     }
 
 }

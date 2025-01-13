@@ -1,70 +1,54 @@
-# Getting Started with Create React App
+# Login-Register
+  This GitHub repository contains code that powers both the <b>frontend & backend</b> of <b> resetting forgotten passwords</b> of users in <b>Megagram</b>. Megagram is a blend of some of the features of <b>Instagram and Amazon</b>, combined into a single website. It was created by me, <b>Rishav Ray</b>, as a personal project to <b>acquire and then showcase</b> my skills.
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+  Because a major portion of the project depends on <b>the cloud</b>, in order to <b>save costs</b> on that, I <b>only activate</b> my frontend, backend and data/cloud-services for about 1-2 days max upon request(<b>my contact-info is presented in the bottom-section</b>), assuming that there isn't too many cloud-services also running at the time. <b>Once they're activated</b>, you should know that the frontend-urls begin with https://megagram.com/loginregister/, and the backend-urls with https://megagram.com/loginregister/api/.
 
-## Available Scripts
+  If you so choose, you can use the <b>username 'testuser'</b> and the <b>password 'IamTESTINGMegagram1!!'</b> to login to Megagram as an actual user(although <b>you won't be able to edit/delete</b> this account of-course).
 
-In the project directory, you can run:
+  Welcome aboard!
 
-### `npm start`
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Table of Contents
+  0. [Project Disclaimers](#project-disclaimers)
+  1. [Key Details of Frontend](#key-details-of-frontend)
+  2. [Key Details of Backend](#key-details-of-backend)
+  3. [Key Details of Data](#key-details-of-data)
+  4. [Key Details of Cloud](#key-details-of-cloud)
+  5. [Running the Frontend and Backend](#running-the-frontend-and-backend)
+  6. [Video of Frontend](#video-of-frontend)
+  7. [Video of Backend](#video-of-frontend)
+  8. [Finale(My Contact Info is Here)](#finale)
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
 
-### `npm test`
+## Project Disclaimers
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-### `npm run build`
+## Key Details of Frontend
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Key Details of Backend
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
-### `npm run eject`
+## Key Details of Data
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## Key Details of Cloud
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## Running the Frontend and Backend
 
-## Learn More
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## Video of Frontend
 
-To learn React, check out the [React documentation](https://reactjs.org/).
 
-### Code Splitting
+## Video of Backend
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
 
-### Analyzing the Bundle Size
+## Finale
+  Thank you for sticking around till the end! Hope you found what you were looking for. Whether you did or did not, feel free to reach out to me using any of the following methods:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+  * Email: rishavray422@gmail.com
 
-### Making a Progressive Web App
+  * Number(texting only): <span style="color:#03b6fc">608-443-7805</span>
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+  * Linkedin: https://www.fakelink.com
