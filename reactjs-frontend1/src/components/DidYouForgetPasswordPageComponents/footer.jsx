@@ -5,7 +5,7 @@ function Footer({changeLanguage, footerText}) {
 
     return (
         <>
-            <footer style={{textAlign: 'center', color: 'gray', fontSize: '1.1em', marginTop: '16em',
+            <footer style={{textAlign: 'center', color: 'gray', fontSize: '0.88em', marginTop: '16em',
             overflowWrap: 'break-word', maxWidth: '80%'}}>
                 {footerText}
             </footer>

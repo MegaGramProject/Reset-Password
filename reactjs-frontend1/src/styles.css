@@ -7,6 +7,32 @@
 
 
 @media (prefers-color-scheme: dark) {
+    body {
+        background-color: #232424 !important;
+        color: white !important;
+    }
+
+    .box {
+        border-color: rgb(52, 50, 50) !important;
+        background-color: #343333 !important;
+    }
+
+    select {
+        background-color: #232424 !important;
+        color: white !important;
+    }
+
+    .iconsToBeAdjustedForDarkMode {
+        filter: brightness(5) contrast(0) !important;
+    }
+
+    a {
+        color: white !important;
+    }
+
+    #backToLoginBox {
+        background-color: black !important;
+    }
 }
 
 body {
@@ -35,4 +61,8 @@ body {
     padding: 0.5em 1em;
     font-size: 1em;
     margin-top: 1.125em;
+}
+
+a {
+    color: black;
 }

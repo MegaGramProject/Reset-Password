@@ -5,8 +5,9 @@ function Footer({changeLanguage, footerText}) {
 
     return (
         <>
-            <footer style={{textAlign: 'center', color: 'gray', fontSize: '0.88em'}}>
-                {footerText}
+            <footer style={{textAlign: 'center', color: 'gray', fontSize: '0.88em',
+            overflowWrap: 'break-word', maxWidth: '80%'}}>
+                {footerText} 
             </footer>
             
             <select style={{marginTop: '1em', width: '12em', marginBottom: '3em', outline: 'none'}}

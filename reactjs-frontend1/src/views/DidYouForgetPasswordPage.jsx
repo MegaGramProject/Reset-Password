@@ -6,7 +6,7 @@ import Popup from '../components/DidYouForgetPasswordPageComponents/popup';
 import '../styles.css';
 import blackScreen from '../assets/images/blackScreen.png';
 
-function DidYouForgetPassword() {
+function DidYouForgetPasswordPage() {
     const [language , setLanguage] = useState("English");
     const [isButtonEnabled, setIsButtonEnabled] = useState(false);
     const [showPopup, setShowPopup] = useState(false);
@@ -62,7 +62,7 @@ function DidYouForgetPassword() {
         document.title = "Forgot Password?";
     }, []);
 
-
+    
     async function changeLanguage(newLanguage) {
         let redisCachedLanguageTranslations = {};
         try {
@@ -355,4 +355,4 @@ function DidYouForgetPassword() {
     );
 }
 
-export default DidYouForgetPassword;
+export default DidYouForgetPasswordPage;

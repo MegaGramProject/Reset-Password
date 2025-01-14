@@ -1,19 +1,23 @@
-import { useEffect } from 'react';
+import { useRef, useEffect } from 'react';
 import favicon from '../assets/images/favicon.ico';
 import favicon1 from '../assets/images/favicon1.ico';
 import megagramLoading from '../assets/images/megagramLoading.png';
 import Parallax from 'parallax-js';
 
-function NotFound() {
+function NotFoundPage() {
+    const sceneRef = useRef(null);
+
+
     useEffect(() => {
-        const scene = document.getElementById('scene');
-        if (scene) {
-            new Parallax(scene);
+        const sceneRefElement = sceneRef.current;
+        if (sceneRefElement) {
+            new Parallax(sceneRefElement);
         }
         
         document.title = "Page not Found · 404";
 
     }, []);
+
 
     const takeUserToHomePage = () => {
         window.location.href = 'http://34.111.89.101/homefeed';
@@ -717,7 +721,7 @@ function NotFound() {
 
             <section className="wrapper">
                 <div className="container">
-                    <div id="scene" className="scene" data-hover-only="false">
+                    <div ref={sceneRef} className="scene" data-hover-only="false">
                         <div className="circle" data-depth="1.2"></div>
 
                         <div className="one" data-depth="0.9">
@@ -783,4 +787,4 @@ function NotFound() {
     );
 };
 
-export default NotFound;
+export default NotFoundPage;

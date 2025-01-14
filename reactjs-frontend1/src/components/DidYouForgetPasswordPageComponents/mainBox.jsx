@@ -65,7 +65,9 @@ inputPlaceholderText, buttonText, orText, createAccountText, backToLoginText}) {
             <>
                 <div className="box" style={{padding: '3em 1em', width: '31em',
                 marginTop: '3em'}}>
-                    <img src={lockSymbol} style={{width: '47%', height: '47%', objectFit: 'contain', pointerEvents: 'none'}}/>
+                    <img className="iconsToBeAdjustedForDarkMode"
+                    src={lockSymbol} style={{width: '47%', height: '47%', objectFit: 'contain', pointerEvents: 'none'}}/>
+
                     <p style={{ fontSize: '1.5em', fontWeight: 'bold', overflowWrap: 'break-word', maxWidth: '80%'}}>
                         {troubleLoggingInText}
                     </p>
@@ -101,10 +103,10 @@ inputPlaceholderText, buttonText, orText, createAccountText, backToLoginText}) {
                     <br/>
                 </div>
                 
-                <div className="box" style={{width: '31em', backgroundColor: '#f7f5f5', borderStyle: 'solid',
+                <div id="backToLoginBox" className="box" style={{width: '31em', backgroundColor: '#f7f5f5', borderStyle: 'solid',
                 borderColor: 'gray', padding: '1em 1em'}}>
                     <a href="http://34.111.89.101/loginregister/login"
-                    style={{ fontWeight: 'bold', fontSize: '1.2em', color: 'black', textDecoration: 'none',
+                    style={{ fontWeight: 'bold', fontSize: '1.2em', textDecoration: 'none',
                     overflowWrap: 'break-word', maxWidth: '80%'}}>
                         {backToLoginText}
                     </a>
