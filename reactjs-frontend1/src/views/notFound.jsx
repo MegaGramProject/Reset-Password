@@ -19,6 +19,10 @@ function NotFound() {
         window.location.href = 'http://34.111.89.101/homefeed';
     };
 
+    const takeUserToForgotPasswordPage = () => {
+        window.location.href = 'http://34.111.89.101/resetpassword/forgotPassword';
+    }
+
     const styles = `
     import url("https://fonts.googleapis.com/css?family=Barlow+Condensed:300,400,500,600,700,800,900|Barlow:300,400,500,600,700,800,900&display=swap");
 
@@ -749,9 +753,9 @@ function NotFound() {
                             <p>
                                 Uh oh! Looks like you got lost. Life happens.
                                 <br />
-                                Go back to the homepage if you dare!
+                                Go to the 'forgot-password page' if you dare!
                             </p>
-                            <button onClick={takeUserToHomePage}>I dare!</button>
+                            <button onClick={takeUserToForgotPasswordPage}>I dare!</button>
                             <p
                                 style={{
                                     position: 'absolute',

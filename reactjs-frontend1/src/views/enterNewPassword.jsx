@@ -16,7 +16,8 @@ class EnterNewPassword extends Component {
             isButtonEnabled: "",
             passwordStrengthBarShown: false,
             passwordStrength: "0em",
-            username: ""
+            username: "",
+            footerText: "Megagram, a web-app that blends a bit of Instagram with a bit of Amazon, is a personal project created by Rishav Ray."
         };
         
         document.title = "Enter new Password";
@@ -66,16 +67,17 @@ class EnterNewPassword extends Component {
 
     render() {
         return (
-            <React.Fragment>
-            <HeaderBar language={this.state.language}/>
-            <div style={{display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center'}}>
-            <MainBox language={this.state.language} inputValue={this.state.inputValue} inputValue2={this.state.inputValue2}
-            isButtonEnabled={this.state.isButtonEnabled} onInputChange1={this.onInputChange1} onInputChange2={this.onInputChange2}
-            passwordStrengthBarShown={this.state.passwordStrengthBarShown} passwordStrength = {this.state.passwordStrength}
-            setPasswordStrength={this.onPasswordStrengthChange} toggleStrengthBar = {this.toggleStrengthBar} username={this.state.username}/>
-            <Footer language={this.state.language} changeLanguage={this.changeLanguage} />
-            </div>
-            </React.Fragment>
+            <>
+                <HeaderBar language={this.state.language}/>
+                <div style={{display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center'}}>
+                    <MainBox language={this.state.language} inputValue={this.state.inputValue} inputValue2={this.state.inputValue2}
+                    isButtonEnabled={this.state.isButtonEnabled} onInputChange1={this.onInputChange1} onInputChange2={this.onInputChange2}
+                    passwordStrengthBarShown={this.state.passwordStrengthBarShown} passwordStrength = {this.state.passwordStrength}
+                    setPasswordStrength={this.onPasswordStrengthChange} toggleStrengthBar = {this.toggleStrengthBar} username={this.state.username}/>
+                    
+                    <Footer changeLanguage={this.changeLanguage} footerText={this.state.footerText}/>
+                </div>
+            </>
         );
     };
 }

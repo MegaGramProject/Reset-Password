@@ -1,8 +1,8 @@
 import React from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import NotFound from './views/notFound';
-import DidYouForgetPassword from './views/didYouForgetPassword';
-import EnterNewPassword from './views/enterNewPassword';
+import DidYouForgetPassword from './views/DidYouForgetPassword';
+import EnterNewPassword from './views/EnterNewPassword';
+import NotFound from './views/NotFound';
 
 const Routing = () => (
     <Routes>
