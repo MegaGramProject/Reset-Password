@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
-import Footer from "../components/DidYouForgetPasswordPageComponents/footer";
+import Footer from "../components/ComponentsOfBothPages/footer";
 import HeaderBar from "../components/DidYouForgetPasswordPageComponents/headerBar";
 import MainBox from "../components/DidYouForgetPasswordPageComponents/mainBox";
 import Popup from '../components/DidYouForgetPasswordPageComponents/popup';
-import '../styles.css';
 import blackScreen from '../assets/images/blackScreen.png';
+import '../styles.css';
 
 function DidYouForgetPasswordPage() {
     const [language , setLanguage] = useState("English");
@@ -98,7 +98,7 @@ function DidYouForgetPasswordPage() {
             namesOfTextStatesToTranslate.push('popupMessageText');
         }
         if(okText in redisCachedLanguageTranslations) {
-            setPopupMessageText(redisCachedLanguageTranslations[popupMessageText]);
+            setOkText(redisCachedLanguageTranslations[okText]);
         }
         else {
             valuesOfTextStatesToTranslate.push(okText)
@@ -348,7 +348,8 @@ function DidYouForgetPasswordPage() {
             }
             {showPopup &&
                 <div style={{position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)'}}>
-                    <Popup closePopup={closePopup} popupHeaderText={popupHeaderText} popupMessageText={popupMessageText}/>
+                    <Popup closePopup={closePopup} popupHeaderText={popupHeaderText} popupMessageText={popupMessageText}
+                    okText={okText}/>
                 </div>
             }
         </>

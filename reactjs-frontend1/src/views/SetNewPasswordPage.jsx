@@ -1,12 +1,12 @@
 import { useState, useEffect} from 'react';
 import { useParams } from 'react-router-dom';
-import Footer from "../components/DidYouForgetPasswordPageComponents/footer";
-import HeaderBar from "../components/EnterNewPasswordPageComponents/headerBar";
-import MainBox from "../components/EnterNewPasswordPageComponents/mainBox";
+import Footer from "../components/ComponentsOfBothPages/footer";
+import HeaderBar from "../components/SetNewPasswordPageComponents/headerBar";
+import MainBox from "../components/SetNewPasswordPageComponents/mainBox";
 import '../styles.css';
 
 
-function EnterNewPasswordPage({params}) {
+function SetNewPasswordPage({params}) {
     const [language, setLanguage] = useState("English");
     const [username, setUsername] = useState("");
     const [footerText, setFooterText] = useState(
@@ -55,7 +55,7 @@ function EnterNewPasswordPage({params}) {
 
 
     useEffect(() => {
-        document.title = "Enter new Password";
+        document.title = "Set new Password";
 
         const { username } = params;
         setUsername(username);
@@ -190,9 +190,9 @@ function EnterNewPasswordPage({params}) {
     );
 }
 
-function EnterNewPasswordPageWrapper() {
+function SetNewPasswordPageWrapper() {
     const params = useParams();
-    return <EnterNewPasswordPage params={params} />;
+    return <SetNewPasswordPage params={params} />;
 }
 
-export default EnterNewPasswordPageWrapper;
+export default SetNewPasswordPageWrapper;

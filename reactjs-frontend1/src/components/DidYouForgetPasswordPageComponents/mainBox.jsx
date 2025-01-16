@@ -3,7 +3,7 @@ import lockSymbol from '../../assets/images/lockSymbol.png';
 
 function MainBox({isButtonEnabled, onInputChange, sendLoginLink, troubleLoggingInText, instructionsText,
 inputPlaceholderText, buttonText, orText, createAccountText, backToLoginText}) {
-    const [inputValue, setInputValue] = useState("")
+    const [inputValue, setInputValue] = useState("");
 
     function isValidEmail(email) {
         let atIndex = email.indexOf('@');
@@ -68,10 +68,10 @@ inputPlaceholderText, buttonText, orText, createAccountText, backToLoginText}) {
                     <img className="iconsToBeAdjustedForDarkMode"
                     src={lockSymbol} style={{width: '47%', height: '47%', objectFit: 'contain', pointerEvents: 'none'}}/>
 
-                    <p style={{ fontSize: '1.5em', fontWeight: 'bold', overflowWrap: 'break-word', maxWidth: '80%'}}>
+                    <p className="translatableText" style={{ fontSize: '1.5em', fontWeight: 'bold'}}>
                         {troubleLoggingInText}
                     </p>
-                    <p style={{ color: '#828281', fontSize: '1em', overflowWrap: 'break-word', maxWidth: '80%'}}>
+                    <p className="translatableText" style={{ color: '#828281', fontSize: '1em'}}>
                         {instructionsText}
                     </p>
                     <br/>
@@ -90,11 +90,16 @@ inputPlaceholderText, buttonText, orText, createAccountText, backToLoginText}) {
                         {buttonText}
                     </button>
 
-                    <b style={{color: 'gray', overflowWrap: 'break-word', maxWidth: '80%', marginTop: '2em',
-                    marginBottom: '2em', fontSize: '1.15em'}}>
-                        {orText}
-                    </b>
-
+                    <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%',
+                    gap: '0.5em'}}>
+                        <p style={{color: 'lightgray'}}>──────────────</p>
+                        <b style={{color: 'gray', marginTop: '2em',
+                        marginBottom: '2em', fontSize: '1.15em', width: '3em', overflowWrap: 'break-word'}}>
+                            {orText}  
+                        </b>
+                        <p style={{color: 'lightgray'}}>──────────────</p>
+                    </div>
+        
                     <a href="http://34.111.89.101/loginregister/signup"
                     style={{fontWeight: 'bold', fontSize: '1.2em', marginTop: '1em', color:'#079bdb', textDecoration: 'none',
                     overflowWrap: 'break-word', maxWidth: '80%'}}>

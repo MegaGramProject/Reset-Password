@@ -1,4 +1,4 @@
-# Login-Register
+# Reset-Password
   This GitHub repository contains code that powers both the <b>frontend & backend</b> of <b> resetting forgotten passwords</b> of users in <b>Megagram</b>. Megagram is a blend of some of the features of <b>Instagram and Amazon</b>, combined into a single website. It was created by me, <b>Rishav Ray</b>, as a personal project to <b>acquire and then showcase</b> my skills.
 
   Because a major portion of the project depends on <b>the cloud</b>, in order to <b>save costs</b> on that, I <b>only activate</b> my frontend, backend and data/cloud-services for about 1-2 days max upon request(<b>my contact-info is presented in the bottom-section</b>), assuming that there isn't too many cloud-services also running at the time. <b>Once they're activated</b>, you should know that the frontend-urls begin with https://megagram.com/loginregister/, and the backend-urls with https://megagram.com/loginregister/api/.

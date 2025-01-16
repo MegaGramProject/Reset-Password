@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import blueSecurityKey from '../../assets/images/blueSecurityKey.jpg';
 
 function MainBox({username, createAStrongPasswordText, instructionsText, inputPlaceholderText, inputPlaceholder2Text,
 buttonText}) {
@@ -79,12 +80,14 @@ buttonText}) {
     return (
         <div className="box" style={{width: '28em', marginTop: '3em', padding: '2em 2em',
         gap: '0.75em'}}>
-                <p style={{fontSize: '1.36em', fontWeight: 'bold', overflowWrap: 'break-word',
-                maxWidth: '80%'}}>
+                <p className="translatableText" style={{fontSize: '1.36em', fontWeight: 'bold'}}>
                     {createAStrongPasswordText}
                 </p>
-                <p style={{ color: '#a2a4a6', fontSize: '0.9em', marginBottom: '3em',
-                overflowWrap: 'break-word', maxWidth: '80%'}}>
+
+                <img src={blueSecurityKey} style={{height: '9em', width: '37%', objectFit: 'contain',
+                pointerEvents: 'none'}}></img>
+
+                <p className="translatableText" style={{ color: '#a2a4a6', fontSize: '0.9em', marginBottom: '3em'}}>
                     {instructionsText}
                 </p>
                 <input
@@ -113,12 +116,12 @@ buttonText}) {
                 style={{width: '25.5em', height: '2.7em', backgroundColor: isButtonEnabled ? '#347aeb' : '#82bbf5',
                 cursor: isButtonEnabled ? 'pointer' : '', fontWeight: 'bold'}}
                 onClick = {isButtonEnabled ? resetPassword : null}>
-                    <span style={{overflowWrap: 'break-word', maxWidth: '80%'}}>
+                    <span className="translatableText">
                         {buttonText}
                     </span>
                 </button>
 
-                <p style={{fontSize:'small', marginBottom: '2em', overflowWrap: 'break-word', maxWidth: '80%'}}>
+                <p className="translatableText" style={{fontSize:'small', marginBottom: '2em'}}>
                     {outputMessageText} 
                 </p>
         </div>

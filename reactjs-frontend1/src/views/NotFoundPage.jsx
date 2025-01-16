@@ -757,7 +757,7 @@ function NotFoundPage() {
                             <p>
                                 Uh oh! Looks like you got lost. Life happens.
                                 <br />
-                                Go to the 'forgot-password page' if you dare!
+                                Go to the 'forgot-password page' if that's what you were looking for & you dare!
                             </p>
                             <button onClick={takeUserToForgotPasswordPage}>I dare!</button>
                             <p

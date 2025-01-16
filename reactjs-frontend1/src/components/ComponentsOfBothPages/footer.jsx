@@ -5,14 +5,14 @@ function Footer({changeLanguage, footerText}) {
 
     return (
         <>
-            <footer style={{textAlign: 'center', color: 'gray', fontSize: '0.88em',
+            <footer style={{color: 'gray', fontSize: '0.88em', marginTop: '16em',
             overflowWrap: 'break-word', maxWidth: '80%'}}>
-                {footerText} 
+                {footerText}
             </footer>
             
-            <select style={{marginTop: '1em', width: '12em', marginBottom: '3em', outline: 'none'}}
+            <select style={{marginTop: '1em', width: '13em', padding: '0.5em 0.5em', marginBottom: '3em', outline: 'none'}}
             onChange={changeSelectedLanguage}>
-                <option value="" disabled selected>Change Language</option>
+                <option value="">Change Language</option>
                 <option value="العربية">العربية</option>
                 <option value="বাংলা">বাংলা</option>
                 <option value="Deutsch">Deutsch</option>
