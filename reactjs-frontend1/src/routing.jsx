@@ -7,7 +7,8 @@ import NotFoundPage from './views/NotFoundPage';
 const Routing = () => (
     <Routes>
         <Route exact path="/forgotPassword" element={<DidYouForgetPasswordPage />} />
-        <Route exact path="/setNewPassword/:username" element={<SetNewPasswordPageWrapper />} />
+        <Route exact path="/setNewPassword/:username/:passwordResetToken"
+        element={<SetNewPasswordPageWrapper />} />
         <Route path="*" element={<NotFoundPage />} />
     </Routes>
 );

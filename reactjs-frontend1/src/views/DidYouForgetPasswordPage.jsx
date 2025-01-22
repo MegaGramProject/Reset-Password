@@ -67,7 +67,7 @@ function DidYouForgetPasswordPage() {
         let redisCachedLanguageTranslations = {};
         try {
             const response = await fetch(
-                `http://34.111.89.101/loginregister/api/getRedisCachedLanguageTranslations/
+                `http://34.111.89.101/login-register/api/getRedisCachedLanguageTranslations/
                 ${language}/${newLanguage}`
             );
             if(!response.ok) {
@@ -164,7 +164,7 @@ function DidYouForgetPasswordPage() {
         if (valuesOfTextStatesToTranslate.length>0) {
             let translatedTexts = [];
             try {
-                const response1 = await fetch(`http://34.111.89.101/loginregister/api/translateTextsWithRapidAPIDeepTranslate`, {
+                const response1 = await fetch(`http://34.111.89.101/login-register/api/translateTextsWithRapidAPIDeepTranslate`, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({
@@ -236,11 +236,11 @@ function DidYouForgetPasswordPage() {
         return phoneRegex.test(phoneNumberInput);
     };
 
-    async function sendLoginLink(input) {
+    async function sendLinkForSettingNewPassword(input) {
         setIsButtonEnabled(false);
         if(isValidEmail(input)) {
             try {
-                const response = await fetch('http://localhost:8003/sendLoginLink', {
+                const response = await fetch('http://34.111.89.101/reset-password/api/sendLinkForSettingNewPassword', {
                     method: "POST",
                     headers: {
                         'Content-Type': 'application/json'
@@ -270,7 +270,7 @@ function DidYouForgetPasswordPage() {
         }
         else if(isValidNumber(input)) {
             try {
-                const response = await fetch('http://localhost:8003/sendLoginLink', {
+                const response = await fetch('http://34.111.89.101/reset-password/api/sendLinkForSettingNewPassword', {
                     method: "POST",
                     headers: {
                         'Content-Type': 'application/json'
@@ -300,7 +300,7 @@ function DidYouForgetPasswordPage() {
         }
         else {
             try {
-                const response = await fetch('http://localhost:8003/sendLoginLink', {
+                const response = await fetch('http://34.111.89.101/reset-password/api/sendLinkForSettingNewPassword', {
                     method: "POST",
                     headers: {
                         'Content-Type': 'application/json'
@@ -334,7 +334,8 @@ function DidYouForgetPasswordPage() {
         <>
             <HeaderBar/>
             <div style={{display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center"}}>
-                <MainBox isButtonEnabled={isButtonEnabled} onInputChange={onInputChange} sendLoginLink={sendLoginLink}
+                <MainBox isButtonEnabled={isButtonEnabled} onInputChange={onInputChange}
+                sendLinkForSettingNewPassword={sendLinkForSettingNewPassword}
                 troubleLoggingInText={troubleLoggingInText} instructionsText={instructionsText}
                 inputPlaceholderText={inputPlaceholderText} buttonText={buttonText} orText={orText}
                 createAccountText={createAccountText} backToLoginText={backToLoginText}/>

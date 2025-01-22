@@ -7,8 +7,9 @@ import '../styles.css';
 
 
 function SetNewPasswordPage({params}) {
-    const [language, setLanguage] = useState("English");
     const [username, setUsername] = useState("");
+    const [passwordResetToken, setPasswordResetToken] = useState("");
+    const [language, setLanguage] = useState("English");
     const [footerText, setFooterText] = useState(
         "Megagram, a web-app that blends a bit of Instagram with a bit of Amazon, is a personal project created by Rishav Ray."
     );
@@ -57,8 +58,9 @@ function SetNewPasswordPage({params}) {
     useEffect(() => {
         document.title = "Set new Password";
 
-        const { username } = params;
-        setUsername(username);
+        const { paramsUsername, paramsPasswordResetToken } = params;
+        setUsername(paramsUsername);
+        setPasswordResetToken(paramsPasswordResetToken);
     }, []);
 
 
@@ -66,7 +68,7 @@ function SetNewPasswordPage({params}) {
         let redisCachedLanguageTranslations = {};
         try {
             const response = await fetch(
-                `http://34.111.89.101/loginregister/api/getRedisCachedLanguageTranslations/
+                `http://34.111.89.101/login-register/api/getRedisCachedLanguageTranslations/
                 ${language}/${newLanguage}`
             );
             if(!response.ok) {
@@ -142,7 +144,7 @@ function SetNewPasswordPage({params}) {
         if (valuesOfTextStatesToTranslate.length>0) {
             let translatedTexts = [];
             try {
-                const response1 = await fetch(`http://34.111.89.101/loginregister/api/translateTextsWithRapidAPIDeepTranslate`, {
+                const response1 = await fetch(`http://34.111.89.101/login-register/api/translateTextsWithRapidAPIDeepTranslate`, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({
@@ -179,9 +181,10 @@ function SetNewPasswordPage({params}) {
         <>
             <HeaderBar loginText={loginText} signupText={signupText}/>
             <div style={{display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center'}}>
-                <MainBox username={username} createAStrongPasswordText={createAStrongPasswordText}
-                instructionsText={instructionsText} inputPlaceholderText={inputPlaceholderText}
-                inputPlaceholder2Text={inputPlaceholder2Text} buttonText={buttonText}
+                <MainBox username={username} passwordResetToken={passwordResetToken}
+                createAStrongPasswordText={createAStrongPasswordText} instructionsText={instructionsText}
+                inputPlaceholderText={inputPlaceholderText} inputPlaceholder2Text={inputPlaceholder2Text}
+                buttonText={buttonText}
                 />
                 
                 <Footer changeLanguage={changeLanguage} footerText={footerText}/>

@@ -1,10 +1,10 @@
 function HeaderBar({loginText, signupText}) {    
     function takeUserToLogin() {
-        window.location.href = "http://34.111.89.101/loginregister/login";
+        window.location.href = "http://34.111.89.101/login-register/login";
     }
 
     function takeUserToSignup() {
-        window.location.href = "http://34.111.89.101/loginregister/signup";
+        window.location.href = "http://34.111.89.101/login-register/signup";
     }
 
     return (

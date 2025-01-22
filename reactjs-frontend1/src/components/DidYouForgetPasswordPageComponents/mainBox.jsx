@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import lockSymbol from '../../assets/images/lockSymbol.png';
 
-function MainBox({isButtonEnabled, onInputChange, sendLoginLink, troubleLoggingInText, instructionsText,
+function MainBox({isButtonEnabled, onInputChange, sendLinkForSettingNewPassword, troubleLoggingInText, instructionsText,
 inputPlaceholderText, buttonText, orText, createAccountText, backToLoginText}) {
     const [inputValue, setInputValue] = useState("");
 
@@ -86,7 +86,7 @@ inputPlaceholderText, buttonText, orText, createAccountText, backToLoginText}) {
                     className="blueButton"
                     style={{width: '23.5em', height: '3em', backgroundColor: isButtonEnabled ? '#347aeb' : '#82bbf5',
                     cursor: isButtonEnabled ? 'pointer' : '', overflowWrap: 'break-word', maxWidth: '80%'}}
-                    onClick = {isButtonEnabled ? () => {sendLoginLink(inputValue)} : null}>
+                    onClick = {isButtonEnabled ? () => {sendLinkForSettingNewPassword(inputValue)} : null}>
                         {buttonText}
                     </button>
 
@@ -100,7 +100,7 @@ inputPlaceholderText, buttonText, orText, createAccountText, backToLoginText}) {
                         <p style={{color: 'lightgray'}}>──────────────</p>
                     </div>
         
-                    <a href="http://34.111.89.101/loginregister/signup"
+                    <a href="http://34.111.89.101/login-register/signup"
                     style={{fontWeight: 'bold', fontSize: '1.2em', marginTop: '1em', color:'#079bdb', textDecoration: 'none',
                     overflowWrap: 'break-word', maxWidth: '80%'}}>
                         {createAccountText}
@@ -110,7 +110,7 @@ inputPlaceholderText, buttonText, orText, createAccountText, backToLoginText}) {
                 
                 <div id="backToLoginBox" className="box" style={{width: '31em', backgroundColor: '#f7f5f5', borderStyle: 'solid',
                 borderColor: 'gray', padding: '1em 1em'}}>
-                    <a href="http://34.111.89.101/loginregister/login"
+                    <a href="http://34.111.89.101/login-register/login"
                     style={{ fontWeight: 'bold', fontSize: '1.2em', textDecoration: 'none',
                     overflowWrap: 'break-word', maxWidth: '80%'}}>
                         {backToLoginText}

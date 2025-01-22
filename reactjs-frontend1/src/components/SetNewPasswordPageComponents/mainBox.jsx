@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import blueSecurityKey from '../../assets/images/blueSecurityKey.jpg';
 
-function MainBox({username, createAStrongPasswordText, instructionsText, inputPlaceholderText, inputPlaceholder2Text,
-buttonText}) {
+function MainBox({username, passwordResetToken, createAStrongPasswordText, instructionsText, inputPlaceholderText,
+inputPlaceholder2Text, buttonText}) {
 
     const [inputValue, setInputValue] = useState("");
     const [inputValue2, setInputValue2] = useState("");
@@ -13,17 +13,15 @@ buttonText}) {
 
     function resetPassword() {
         setIsButtonEnabled(false);
-        const createUserURL = "http://34.111.89.101/loginregister/api/updateUser/" + username;
-        const headers  = {
+        fetch(`http://34.111.89.101/reset-passsword/api/resetPassword/${username}/${passwordResetToken}`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                "password": inputValue
+                "newPassword": inputValue
             })
-        };
-        fetch(createUserURL, headers)
+        })
         .then(response => {
             if (!response.ok) {
                 setIsButtonEnabled(true);
@@ -32,7 +30,7 @@ buttonText}) {
             else {
                 setOutputMessageText("Your password has been changed successfully!");
                 setTimeout(() => {
-                    window.location.href = 'http://34.111.89.101/loginregister/login';
+                    window.location.href = 'http://34.111.89.101/login-register/login';
                 }, 2500)
             }
         }).catch(_ => {

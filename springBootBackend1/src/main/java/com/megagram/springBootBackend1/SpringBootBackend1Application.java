@@ -1,4 +1,4 @@
-package com.example.springBootBackend1;
+package com.megagram.springBootBackend1;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
