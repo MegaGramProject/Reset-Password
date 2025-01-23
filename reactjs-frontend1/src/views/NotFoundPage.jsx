@@ -675,7 +675,7 @@ function NotFoundPage() {
     width: 80px;
     animation-name: pieceLeft;
     animation-delay: 4.5s;
-    }/*# sourceMappingURL=notFoundStyles.css.map */
+    }
     `;
 
 
