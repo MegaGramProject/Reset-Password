@@ -33,6 +33,14 @@ server {
         proxy_set_header X-Forwarded-Proto \$scheme;
     }
 
+    location /login-register/api/ {
+        proxy_pass http://35.225.117.2:8001/;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+    }
+
     location /login-register/ {
         proxy_pass http://34.172.22.111:8000/;
         proxy_set_header Host \$host;
@@ -41,8 +49,16 @@ server {
         proxy_set_header X-Forwarded-Proto \$scheme;
     }
 
-    location /login-register/api/ {
-        proxy_pass http://35.225.117.2:8001/;
+    location /reset-password/api/ {
+        proxy_pass https://spring-boot-backend-1.herokuapp.com/;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+    }
+    
+    location /reset-password/ {
+        proxy_pass https://reactjs-frontend-1.herokuapp.com/;
         proxy_set_header Host \$host;
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;

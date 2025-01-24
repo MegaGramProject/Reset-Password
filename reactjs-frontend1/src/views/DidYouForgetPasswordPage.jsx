@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Footer from "../components/ComponentsOfBothPages/footer";
 import HeaderBar from "../components/DidYouForgetPasswordPageComponents/headerBar";
 import MainBox from "../components/DidYouForgetPasswordPageComponents/mainBox";
@@ -25,7 +26,8 @@ function DidYouForgetPasswordPage() {
     const [orText, setOrText] = useState("OR");
     const [createAccountText, setCreateAccountText] = useState("Create new account");
     const [backToLoginText, setBackToLoginText] = useState("Back to login");
-
+    
+    const navigate = useNavigate(); 
 
     const textStateNameToTextStateSetterMappings = {
         'popupHeaderText': setPopupHeaderText,
@@ -60,10 +62,20 @@ function DidYouForgetPasswordPage() {
 
     useEffect(() => {
         document.title = "Forgot Password?";
+
+        const queryString = window.location.search.substring(1);
+        const params = new URLSearchParams(queryString);
+        const lingo = params.get("language");
+        if (lingo) {
+            changeLanguage(lingo);
+        }
     }, []);
 
     
     async function changeLanguage(newLanguage) {
+        if(language===newLanguage) {
+            return;
+        }
         let redisCachedLanguageTranslations = {};
         try {
             const response = await fetch(
@@ -193,6 +205,24 @@ function DidYouForgetPasswordPage() {
             }
         }
 
+        if (newLanguage === 'English') {
+            navigate('/reset-password/forgotPassword', 
+            {
+                replace: true,
+                state: {
+                    title: 'Forgot Password?'
+                }
+            });
+        } else {
+            navigate(
+                `/reset-password/forgotPassword?language=${newLanguage}`,
+                {
+                    replace: true,
+                    state: {
+                        title: 'Forgot Password?'
+                    }
+                });
+        }
         setLanguage(newLanguage);
     }
 

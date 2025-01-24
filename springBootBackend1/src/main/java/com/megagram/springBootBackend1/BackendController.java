@@ -144,6 +144,11 @@ public class BackendController {
             String email = request.get("email");
             String username = getUsernameFromContactInfo(email);
             if (username != null) {
+                if(username.equals("testuser")) {
+                    return new ResponseEntity<String>(
+                        "@testuser cannot set a new username or password", HttpStatus.INTERNAL_SERVER_ERROR
+                    ); 
+                }
                 try {
                     String passwordResetToken = generateNewPasswordResetToken(username);
                     sendEmail(email, username, passwordResetToken);
@@ -161,6 +166,11 @@ public class BackendController {
             String number = request.get("number");
             String username = getUsernameFromContactInfo(number);
             if (username != null) {
+                if(username.equals("testuser")) {
+                    return new ResponseEntity<String>(
+                        "@testuser cannot set a new username or password", HttpStatus.INTERNAL_SERVER_ERROR
+                    ); 
+                }
                 try {
                     String passwordResetToken = generateNewPasswordResetToken(username);
                     sendSMS(number, username, passwordResetToken);
@@ -176,6 +186,11 @@ public class BackendController {
         }
         else if (request.containsKey("username")) {
             String username = request.get("username");
+            if(username.equals("testuser")) {
+                return new ResponseEntity<String>(
+                    "@testuser cannot set a new username or password", HttpStatus.INTERNAL_SERVER_ERROR
+                ); 
+            }
             String contactInfo = getContactInfoFromUsername(username);
             if (contactInfo != null) {
                 try {
@@ -206,6 +221,11 @@ public class BackendController {
     @CrossOrigin({"http://34.111.89.101", "http://localhost:8002"})
     public ResponseEntity<String> resetPassword(@RequestBody Map<String, String> request,
     @PathVariable String username, @PathVariable String passwordResetToken) throws NoSuchAlgorithmException {
+        if(username.equals("testuser")) {
+            return new ResponseEntity<String>(
+                "@testuser cannot set a new username or password", HttpStatus.INTERNAL_SERVER_ERROR
+            ); 
+        }
         if (request.containsKey("newPassword")) {
             String newPassword = request.get("newPassword");
             if (passwordInputIsStrongEnough(newPassword)) {
@@ -383,23 +403,6 @@ public class BackendController {
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
         byte[] hash = digest.digest(token.getBytes());
         return Base64.getEncoder().encodeToString(hash);
-    }
-
-    private String getExpirationDate(int minutes) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.MINUTE, minutes);
-        Date expiryDate = calendar.getTime();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        return sdf.format(expiryDate);
-    }
-
-     private boolean isUserTaggedInSlide(Object[][] taggedAccountsOfSlide, String username) {
-        for (Object[] taggedAccount : taggedAccountsOfSlide) {
-            if (taggedAccount[2].equals(username)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     private String decryptDataWithGCKMS(String projectId, String locationId, String keyRingId, String keyId,

@@ -1,5 +1,5 @@
 import { useState, useEffect} from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import Footer from "../components/ComponentsOfBothPages/footer";
 import HeaderBar from "../components/SetNewPasswordPageComponents/headerBar";
 import MainBox from "../components/SetNewPasswordPageComponents/mainBox";
@@ -24,7 +24,8 @@ function SetNewPasswordPage({params}) {
     const [inputPlaceholderText, setInputPlaceholderText] = useState("New password");
     const [inputPlaceholder2Text, setInputPlaceholder2Text] = useState("Confirm new password");
     const [buttonText, setButtonText] = useState("Reset password");
-
+    
+    const navigate = useNavigate(); 
 
     const textStateNameToTextStateSetterMappings = {
         'footerText': setFooterText,
@@ -38,7 +39,6 @@ function SetNewPasswordPage({params}) {
         'inputPlaceholder2Text': setInputPlaceholder2Text,
         'buttonText': setButtonText,
     };
-
     const languageLongFormToShortCodeMappings = {
         English: "en",
         Français: "fr",
@@ -56,15 +56,25 @@ function SetNewPasswordPage({params}) {
 
 
     useEffect(() => {
-        document.title = "Set new Password";
+        document.title = "Set New Password";
 
         const { paramsUsername, paramsPasswordResetToken } = params;
         setUsername(paramsUsername);
         setPasswordResetToken(paramsPasswordResetToken);
+
+        const queryString = window.location.search.substring(1);
+        const urlParams = new URLSearchParams(queryString);
+        const lingo = urlParams.get("language");
+        if (lingo) {
+            changeLanguage(lingo);
+        }
     }, []);
 
 
     async function changeLanguage(newLanguage) {
+        if(language===newLanguage) {
+            return;
+        }
         let redisCachedLanguageTranslations = {};
         try {
             const response = await fetch(
@@ -173,6 +183,24 @@ function SetNewPasswordPage({params}) {
             }
         }
 
+        if (newLanguage === 'English') {
+            navigate(`/reset-password/setNewPassword/${username}/${passwordResetToken}`,
+            {
+                replace: true,
+                state: {
+                    title: 'Set New Password'
+                }
+            });
+        } else {
+            navigate(
+                `/reset-password/setNewPassword/${username}/${passwordResetToken}?language=${newLanguage}`,
+                {
+                    replace: true,
+                    state: {
+                        title: 'Set New Password'
+                    }
+                });
+        }
         setLanguage(newLanguage);
     }
 
