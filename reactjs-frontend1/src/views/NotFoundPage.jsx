@@ -1,8 +1,9 @@
 import { useRef, useEffect } from 'react';
+import Parallax from 'parallax-js';
+
 import favicon from '../assets/images/favicon.ico';
 import favicon1 from '../assets/images/favicon1.ico';
 import megagramLoading from '../assets/images/megagramLoading.png';
-import Parallax from 'parallax-js';
 
 function NotFoundPage() {
     const sceneRef = useRef(null);
@@ -19,13 +20,10 @@ function NotFoundPage() {
     }, []);
 
 
-    const takeUserToHomePage = () => {
-        window.location.href = 'http://34.111.89.101/homefeed';
-    };
-
-    const takeUserToForgotPasswordPage = () => {
-        window.location.href = 'http://34.111.89.101/resetpassword/forgotPassword';
+    function takeUserToForgotPasswordPage() {
+        window.location.href = 'http://localhost:8001/send-link-to-reset-password';
     }
+
 
     const styles = `
     import url("https://fonts.googleapis.com/css?family=Barlow+Condensed:300,400,500,600,700,800,900|Barlow:300,400,500,600,700,800,900&display=swap");
@@ -675,8 +673,7 @@ function NotFoundPage() {
     width: 80px;
     animation-name: pieceLeft;
     animation-delay: 4.5s;
-    }
-    `;
+    }`;
 
 
     return (
@@ -685,7 +682,7 @@ function NotFoundPage() {
             <nav>
                 <div className="menu">
                     <p
-                        onClick={takeUserToHomePage}
+                        onClick={takeUserToForgotPasswordPage}
                         className="website_name"
                         style={{
                             fontFamily: 'Billabong',
@@ -697,17 +694,17 @@ function NotFoundPage() {
                         Megagram
                     </p>
                     <img
-                        onClick={takeUserToHomePage}
+                        onClick={takeUserToForgotPasswordPage}
                         src={favicon1}
                         style={{ height: '4em', width: '4em', cursor: 'pointer' }}
                     />
                     <img
-                        onClick={takeUserToHomePage}
+                        onClick={takeUserToForgotPasswordPage}
                         src={favicon}
                         style={{ height: '4em', width: '4em', cursor: 'pointer' }}
                     />
                     <img
-                        onClick={takeUserToHomePage}
+                        onClick={takeUserToForgotPasswordPage}
                         src={megagramLoading}
                         style={{
                             height: '7em',

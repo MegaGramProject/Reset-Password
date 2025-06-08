@@ -1,31 +1,34 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Footer from "../components/ComponentsOfBothPages/footer";
-import HeaderBar from "../components/DidYouForgetPasswordPageComponents/headerBar";
-import MainBox from "../components/DidYouForgetPasswordPageComponents/mainBox";
-import Popup from '../components/DidYouForgetPasswordPageComponents/popup';
+
+import Footer from '../components/ComponentsOfBothPages/footer';
+import HeaderBar from '../components/SendLinkToResetPasswordPageComponents/headerBar';
+import MainBox from '../components/SendLinkToResetPasswordPageComponents/mainBox';
+import Popup from '../components/SendLinkToResetPasswordPageComponents/popup';
+
 import blackScreen from '../assets/images/blackScreen.png';
+
 import '../styles.css';
 
-function DidYouForgetPasswordPage() {
-    const [language , setLanguage] = useState("English");
+function SendLinkToResetPasswordPage() {
+    const [language , setLanguage] = useState('English');
     const [isButtonEnabled, setIsButtonEnabled] = useState(false);
     const [showPopup, setShowPopup] = useState(false);
-    const [popupHeaderText, setPopupHeaderText] = useState("Popup Header");
-    const [popupMessageText, setPopupMessageText] = useState("This is the Popup Message");
-    const [okText, setOkText] = useState("Ok");
+    const [popupHeaderText, setPopupHeaderText] = useState('Popup Header');
+    const [popupMessageText, setPopupMessageText] = useState('This is the Popup Message');
+    const [okText, setOkText] = useState('Ok');
     const [footerText, setFooterText] = useState(
-        "Megagram, a web-app that blends a bit of Instagram with a bit of Amazon, is a personal project created by Rishav Ray."
+        'Megagram, a web-application that blends a bit of Instagram with a bit of Amazon, is a personal project of Rishav Ray.'
     );
-    const [troubleLoggingInText, setTroubleLoggingInText] = useState("Trouble logging in?");
+    const [troubleLoggingInText, setTroubleLoggingInText] = useState('Trouble logging in?');
     const [instructionsText, setInstructionsText] = useState(
         "Enter your email, phone, or username and we'll send you a link to get back into your account."
     );
-    const [inputPlaceholderText, setInputPlaceholderText] = useState("Email, phone number, or username");
-    const [buttonText, setButtonText] = useState("Send login link");
-    const [orText, setOrText] = useState("OR");
-    const [createAccountText, setCreateAccountText] = useState("Create new account");
-    const [backToLoginText, setBackToLoginText] = useState("Back to login");
+    const [inputPlaceholderText, setInputPlaceholderText] = useState('Email, phone number, or username');
+    const [buttonText, setButtonText] = useState('Send login link');
+    const [orText, setOrText] = useState('OR');
+    const [createAccountText, setCreateAccountText] = useState('Create new account');
+    const [backToLoginText, setBackToLoginText] = useState('Back to login');
     
     const navigate = useNavigate(); 
 
@@ -45,27 +48,27 @@ function DidYouForgetPasswordPage() {
         'backToLoginText': setBackToLoginText
     };
     const languageLongFormToShortCodeMappings = {
-        English: "en",
-        Français: "fr",
-        Español: "es",
-        हिंदी: "hi",
-        বাংলা: "bn",
-        中国人: "zh-CN",
-        العربية: "ar",
-        Deutsch: "de",
-        "Bahasa Indonesia": "id",
-        Italiano: "it",
-        日本語: "ja",
-        Русский: "ru"
+        English: 'en',
+        Français: 'fr',
+        Español: 'es',
+        हिंदी: 'hi',
+        বাংলা: 'bn',
+        中国人: 'zh-CN',
+        العربية: 'ar',
+        Deutsch: 'de',
+        'Bahasa Indonesia': 'id',
+        Italiano: 'it',
+        日本語: 'ja',
+        Русский: 'ru'
     };
 
 
     useEffect(() => {
-        document.title = "Forgot Password?";
+        document.title = 'Forgot Password?';
 
         const queryString = window.location.search.substring(1);
         const params = new URLSearchParams(queryString);
-        const lingo = params.get("language");
+        const lingo = params.get('language');
         if (lingo) {
             changeLanguage(lingo);
         }
@@ -73,7 +76,7 @@ function DidYouForgetPasswordPage() {
 
     
     async function changeLanguage(newLanguage) {
-        if(language===newLanguage) {
+        if(language === newLanguage) {
             return;
         }
         let redisCachedLanguageTranslations = {};
@@ -83,14 +86,14 @@ function DidYouForgetPasswordPage() {
                 ${language}/${newLanguage}`
             );
             if(!response.ok) {
-                console.error("The server had trouble providing the Redis-cached language-translations");
+                console.error('The server had trouble providing the Redis-cached language-translations');
             }
             else {
                 redisCachedLanguageTranslations = await response.json();
             }
         }
         catch (error) {
-            console.error("There was trouble connecting to the server to get the Redis-cached language-translations");
+            console.error('There was trouble connecting to the server to get the Redis-cached language-translations');
         }
 
         const valuesOfTextStatesToTranslate = [];
@@ -268,94 +271,113 @@ function DidYouForgetPasswordPage() {
 
     async function sendLinkForSettingNewPassword(input) {
         setIsButtonEnabled(false);
+        
         if(isValidEmail(input)) {
+            setShowPopup(true);
+            setPopupHeaderText('Success');
+            setPopupMessageText('A login-link has successfully been emailed to you.');
+            return;
+            //the code below has been skipped for frontend demonstration purposes. the backend is not running
+
             try {
                 const response = await fetch('http://34.111.89.101/reset-password/api/sendLinkForSettingNewPassword', {
-                    method: "POST",
+                    method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        "email": input
+                        'email': input
                     })
                 });
                 if (!response.ok) {
                     setIsButtonEnabled(true);
                     setShowPopup(true);
-                    setPopupHeaderText("Error");
-                    setPopupMessageText("The server could not email you the login-link.");
+                    setPopupHeaderText('Error');
+                    setPopupMessageText('The server could not email you the login-link.');
                 }
                 else {
                     setShowPopup(true);
-                    setPopupHeaderText("Success");
-                    setPopupMessageText("A login-link has successfully been emailed to you.");
+                    setPopupHeaderText('Success');
+                    setPopupMessageText('A login-link has successfully been emailed to you.');
                 }
             }
             catch(error) {
                 setIsButtonEnabled(true);
                 setShowPopup(true);
-                setPopupHeaderText("Error");
-                setPopupMessageText("There was trouble connecting to the server to email you the login-link.");
+                setPopupHeaderText('Error');
+                setPopupMessageText('There was trouble connecting to the server to email you the login-link.');
             }
         }
         else if(isValidNumber(input)) {
+            setShowPopup(true);
+            setPopupHeaderText('Success');
+            setPopupMessageText('A login-link has successfully been texted to you.');
+            return;
+            //the code below has been skipped for frontend demonstration purposes. the backend is not running
+
             try {
                 const response = await fetch('http://34.111.89.101/reset-password/api/sendLinkForSettingNewPassword', {
-                    method: "POST",
+                    method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        "number": input
+                        'number': input
                     })
                 });
                 if (!response.ok) {
                     setIsButtonEnabled(true);
                     setShowPopup(true);
-                    setPopupHeaderText("Error");
-                    setPopupMessageText("The server could not text you the login-link.");
+                    setPopupHeaderText('Error');
+                    setPopupMessageText('The server could not text you the login-link.');
                 }
                 else {
                     setShowPopup(true);
-                    setPopupHeaderText("Success");
-                    setPopupMessageText("A login-link has successfully been texted to you.");
+                    setPopupHeaderText('Success');
+                    setPopupMessageText('A login-link has successfully been texted to you.');
                 }
             }
             catch(error) {
                 setIsButtonEnabled(true);
                 setShowPopup(true);
-                setPopupHeaderText("Error");
-                setPopupMessageText("There was trouble connecting to the server to text you the login-link.");
+                setPopupHeaderText('Error');
+                setPopupMessageText('There was trouble connecting to the server to text you the login-link.');
             }
         }
         else {
+            setShowPopup(true);
+            setPopupHeaderText('Success');
+            setPopupMessageText('A login-link has successfully been sent to you.');
+            return;
+            //the code below has been skipped for frontend demonstration purposes. the backend is not running
+
             try {
                 const response = await fetch('http://34.111.89.101/reset-password/api/sendLinkForSettingNewPassword', {
-                    method: "POST",
+                    method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        "username": input
+                        'username': input
                     })
                 });
                 if (!response.ok) {
                     setIsButtonEnabled(true);
                     setShowPopup(true);
-                    setPopupHeaderText("Error");
-                    setPopupMessageText("The server could not send you the login-link.");
+                    setPopupHeaderText('Error');
+                    setPopupMessageText('The server could not send you the login-link.');
                 }
                 else {
                     setShowPopup(true);
-                    setPopupHeaderText("Success");
-                    setPopupMessageText("A login-link has successfully been sent to you.");
+                    setPopupHeaderText('Success');
+                    setPopupMessageText('A login-link has successfully been sent to you.');
                 }
             }
             catch(error) {
                 setIsButtonEnabled(true);
                 setShowPopup(true);
-                setPopupHeaderText("Error");
-                setPopupMessageText("There was trouble connecting to the server to send you the login-link.");
+                setPopupHeaderText('Error');
+                setPopupMessageText('There was trouble connecting to the server to send you the login-link.');
             }
         }
     }
@@ -363,7 +385,8 @@ function DidYouForgetPasswordPage() {
     return (
         <>
             <HeaderBar/>
-            <div style={{display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center"}}>
+
+            <div style={{display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center'}}>
                 <MainBox isButtonEnabled={isButtonEnabled} onInputChange={onInputChange}
                 sendLinkForSettingNewPassword={sendLinkForSettingNewPassword}
                 troubleLoggingInText={troubleLoggingInText} instructionsText={instructionsText}
@@ -375,10 +398,10 @@ function DidYouForgetPasswordPage() {
             
             {showPopup &&
                 <img src={blackScreen} onClick={closePopup}
-                style={{position: 'absolute', top: '0%', left: '0%', width: '100%', height: '150%', opacity: '0.7'}}/>
+                style={{position: 'fixed', top: '0%', left: '0%', width: '100%', height: '100%', opacity: '0.7'}}/>
             }
             {showPopup &&
-                <div style={{position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)'}}>
+                <div style={{position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)'}}>
                     <Popup closePopup={closePopup} popupHeaderText={popupHeaderText} popupMessageText={popupMessageText}
                     okText={okText}/>
                 </div>
@@ -387,4 +410,4 @@ function DidYouForgetPasswordPage() {
     );
 }
 
-export default DidYouForgetPasswordPage;
+export default SendLinkToResetPasswordPage;

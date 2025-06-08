@@ -1,29 +1,30 @@
 import { useState, useEffect} from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import Footer from "../components/ComponentsOfBothPages/footer";
-import HeaderBar from "../components/SetNewPasswordPageComponents/headerBar";
-import MainBox from "../components/SetNewPasswordPageComponents/mainBox";
+
+import Footer from '../components/ComponentsOfBothPages/footer';
+import HeaderBar from '../components/SetNewPasswordPageComponents/headerBar';
+import MainBox from '../components/SetNewPasswordPageComponents/mainBox';
+
 import '../styles.css';
 
-
 function SetNewPasswordPage({params}) {
-    const [username, setUsername] = useState("");
-    const [passwordResetToken, setPasswordResetToken] = useState("");
-    const [language, setLanguage] = useState("English");
+    const [username, setUsername] = useState('');
+    const [passwordResetToken, setPasswordResetToken] = useState('');
+    const [language, setLanguage] = useState('English');
     const [footerText, setFooterText] = useState(
-        "Megagram, a web-app that blends a bit of Instagram with a bit of Amazon, is a personal project created by Rishav Ray."
+        'Megagram, a web-application that blends a bit of Instagram with a bit of Amazon, is a personal project of Rishav Ray.'
     );
-    const [loginText, setLoginText] = useState("Log in");
-    const [signupText, setSignupText] = useState("Sign up");
-    const [createAStrongPasswordText, setCreateAStrongPasswordText] = useState("Create a Strong Password");
+    const [loginText, setLoginText] = useState('Log in');
+    const [signupText, setSignupText] = useState('Sign up');
+    const [createAStrongPasswordText, setCreateAStrongPasswordText] = useState('Create a Strong Password');
     const [instructionsText, setInstructionsText] = useState(
         `Your password must be at-least 65% strong according to the password-strength bar.
         Remember that this page is only valid for 30 min, & if you don't reset your password till then, you will
         have to send another login link to your email-address/phone-number!`
     );
-    const [inputPlaceholderText, setInputPlaceholderText] = useState("New password");
-    const [inputPlaceholder2Text, setInputPlaceholder2Text] = useState("Confirm new password");
-    const [buttonText, setButtonText] = useState("Reset password");
+    const [inputPlaceholderText, setInputPlaceholderText] = useState('New password');
+    const [inputPlaceholder2Text, setInputPlaceholder2Text] = useState('Confirm new password');
+    const [buttonText, setButtonText] = useState('Reset password');
     
     const navigate = useNavigate(); 
 
@@ -40,23 +41,23 @@ function SetNewPasswordPage({params}) {
         'buttonText': setButtonText,
     };
     const languageLongFormToShortCodeMappings = {
-        English: "en",
-        Français: "fr",
-        Español: "es",
-        हिंदी: "hi",
-        বাংলা: "bn",
-        中国人: "zh-CN",
-        العربية: "ar",
-        Deutsch: "de",
-        "Bahasa Indonesia": "id",
-        Italiano: "it",
-        日本語: "ja",
-        Русский: "ru"
+        English: 'en',
+        Français: 'fr',
+        Español: 'es',
+        हिंदी: 'hi',
+        বাংলা: 'bn',
+        中国人: 'zh-CN',
+        العربية: 'ar',
+        Deutsch: 'de',
+        'Bahasa Indonesia': 'id',
+        Italiano: 'it',
+        日本語: 'ja',
+        Русский: 'ru'
     };
 
 
     useEffect(() => {
-        document.title = "Set New Password";
+        document.title = 'Set New Password';
 
         const { paramsUsername, paramsPasswordResetToken } = params;
         setUsername(paramsUsername);
@@ -64,7 +65,7 @@ function SetNewPasswordPage({params}) {
 
         const queryString = window.location.search.substring(1);
         const urlParams = new URLSearchParams(queryString);
-        const lingo = urlParams.get("language");
+        const lingo = urlParams.get('language');
         if (lingo) {
             changeLanguage(lingo);
         }
@@ -82,14 +83,14 @@ function SetNewPasswordPage({params}) {
                 ${language}/${newLanguage}`
             );
             if(!response.ok) {
-                console.error("The server had trouble providing the Redis-cached language-translations");
+                console.error('The server had trouble providing the Redis-cached language-translations');
             }
             else {
                 redisCachedLanguageTranslations = await response.json();
             }
         }
         catch (error) {
-            console.error("There was trouble connecting to the server to get the Redis-cached language-translations");
+            console.error('There was trouble connecting to the server to get the Redis-cached language-translations');
         }
 
         const valuesOfTextStatesToTranslate = [];
@@ -221,9 +222,11 @@ function SetNewPasswordPage({params}) {
     );
 }
 
+
 function SetNewPasswordPageWrapper() {
     const params = useParams();
     return <SetNewPasswordPage params={params} />;
 }
+
 
 export default SetNewPasswordPageWrapper;

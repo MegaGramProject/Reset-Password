@@ -1,36 +1,17 @@
 package com.megagram.springBootBackend1;
 
-import com.megagram.springBootBackend1.mysqlModels.User;
-import com.megagram.springBootBackend1.mysqlRepositories.UserRepository;
-import com.megagram.springBootBackend1.psqlModels.PasswordResetToken;
-import com.megagram.springBootBackend1.psqlRepositories.PasswordResetTokenRepository;
-
-import java.io.IOException;
-import java.io.StringWriter;
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.Statement;
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Base64;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.regex.Pattern;
-import java.util.Set;
-import java.util.List;
 
 import javax.mail.Message;
 import javax.mail.Multipart;
@@ -41,46 +22,31 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
-import org.springframework.web.bind.annotation.CrossOrigin;
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
-import com.twilio.Twilio;
+import com.alibaba.fastjson.JSON;
+import com.google.cloud.kms.v1.CryptoKeyName;
+import com.google.cloud.spanner.DatabaseClient;
+import com.google.protobuf.ByteString;
+import com.megagram.springBootBackend1.mysqlModels.User;
+import com.megagram.springBootBackend1.mysqlRepositories.UserRepository;
+import com.megagram.springBootBackend1.psqlModels.PasswordResetToken;
+import com.megagram.springBootBackend1.psqlRepositories.PasswordResetTokenRepository;
 import com.twilio.type.PhoneNumber;
 
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
-import redis.clients.jedis.UnifiedJedis;
 import redis.clients.jedis.DefaultJedisClientConfig;
 import redis.clients.jedis.HostAndPort;
 import redis.clients.jedis.JedisClientConfig;
-
-import com.alibaba.fastjson.JSON;
-
-import com.google.cloud.kms.v1.CryptoKeyName;
-import com.google.cloud.kms.v1.KeyManagementServiceClient;
-import com.google.cloud.kms.v1.DecryptResponse;
-import com.google.protobuf.ByteString;
-
-import com.google.cloud.spanner.DatabaseId;
-import com.google.cloud.spanner.Spanner;
-import com.google.cloud.spanner.SpannerOptions;
-import com.google.cloud.spanner.DatabaseClient;
-
-import org.mindrot.jbcrypt.BCrypt;
+import redis.clients.jedis.UnifiedJedis;
 
 
 @RestController

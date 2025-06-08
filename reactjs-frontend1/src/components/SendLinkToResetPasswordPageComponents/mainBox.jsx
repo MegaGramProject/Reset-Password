@@ -1,4 +1,5 @@
 import { useState } from 'react';
+
 import lockSymbol from '../../assets/images/lockSymbol.png';
 
 function MainBox({isButtonEnabled, onInputChange, sendLinkForSettingNewPassword, troubleLoggingInText, instructionsText,
